@@ -133,6 +133,22 @@ class RulesViewController: UIViewController {
         
     }()
     
+    private lazy var closeButton : UIButton = {
+        let button = UIButton()
+        button.setTitle("Close", for: .normal)
+        button.setTitleColor(UIColor.systemBlue, for: .normal)
+        button.titleLabel?.font = UIFont.systemFont(ofSize: 18, weight: .semibold)
+        button.translatesAutoresizingMaskIntoConstraints = false
+        button.addTarget(self, action: #selector(closeButtonTapped), for: .touchUpInside)
+        return button
+    }()
+    
+    //MARK: - Action Func
+    
+    @objc func closeButtonTapped() {
+        let controller = WelcomeViewController()
+        self.navigationController?.pushViewController(controller, animated: true)
+    }
     
     //MARK: - Life Cycle
     
@@ -143,6 +159,8 @@ class RulesViewController: UIViewController {
     }
 }
 
+
+
 //MARK: - Set Views and Set Constraints
 
 extension RulesViewController {
@@ -150,6 +168,7 @@ extension RulesViewController {
         view.backgroundColor = UIColor(red: (48 / 255), green: (52 / 255), blue: (68 / 255), alpha: 1)
         view.addSubview(titleLabel)
         view.addSubview(scrollView)
+        view.addSubview(closeButton)
         
         
         mainStackView.addArrangedSubview(rulesIntroLabel)
@@ -183,6 +202,9 @@ extension RulesViewController {
             rulesCurrentLevelLabel.widthAnchor.constraint(equalTo: mainStackView.widthAnchor, constant: -40),
             rulesSafeAmountLabel.widthAnchor.constraint(equalTo: mainStackView.widthAnchor, constant: -40),
             rulesTextHintsLabel.widthAnchor.constraint(equalTo: mainStackView.widthAnchor, constant: -40),
+            
+            closeButton.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 16),
+            closeButton.centerYAnchor.constraint(equalTo: titleLabel.centerYAnchor)
         ])
         
         

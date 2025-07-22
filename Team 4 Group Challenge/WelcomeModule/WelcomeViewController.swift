@@ -15,6 +15,7 @@ class WelcomeViewController: UIViewController {
     lazy var buttonRules: UIButton = {
         $0.translatesAutoresizingMaskIntoConstraints = false
         $0.setImage(UIImage(named: "helpBtn"), for: .normal)
+        $0.addTarget(self, action: #selector(rulesButtonTapped), for: .touchUpInside)
         return $0
     }(UIButton())
     
@@ -59,6 +60,13 @@ class WelcomeViewController: UIViewController {
         return $0
     }(UILabel())
     
+    
+    //MARK: - Action Func
+    
+    @objc func rulesButtonTapped() {
+        let controller = RulesViewController()
+        self.navigationController?.pushViewController(controller, animated: true)
+    }
     
     //MARK: - Lifecycle
     
