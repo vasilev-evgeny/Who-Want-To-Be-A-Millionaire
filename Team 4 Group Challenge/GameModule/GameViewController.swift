@@ -124,9 +124,9 @@ class GameViewController: UIViewController {
     private func createAnswerButton(letter: String, title: String) -> UIButton {
         let button = UIButton()
         let titleText = NSMutableAttributedString()
-        titleText.append(attributedText(text: "\(letter):  ", fontSize: 18, color: UIColor(red: 225/255, green: 155/255, blue: 48/255, alpha: 1), firstLineIntend: 24))
+        titleText.append(attributedText(text: "\(letter):  ", fontSize: 18, color: UIColor(red: 225/255, green: 155/255, blue: 48/255, alpha: 1), firstLineIntend: 30))
 
-        titleText.append(attributedText(text: title, fontSize: 18, color: .white, firstLineIntend: 8))
+        titleText.append(attributedText(text: title, fontSize: 18, color: .white))
         button.setBackgroundImage(UIImage(named: "plain_answer"), for: .normal)
         button.setAttributedTitle(titleText, for: .normal)
         button.contentHorizontalAlignment = .left
