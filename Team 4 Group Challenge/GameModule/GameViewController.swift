@@ -11,10 +11,10 @@ class GameViewController: UIViewController {
 
     //MARK: - Create UI Items
     
-    let backgroundImageView : UIImageView = {
-        let backgroundImageView = UIImageView(image: UIImage(named: "backGround"))
-        backgroundImageView.translatesAutoresizingMaskIntoConstraints = false
-            return backgroundImageView
+    let mainView : UIImageView = {
+        let mainView = UIImageView(image: UIImage(named: "backGround"))
+        mainView.translatesAutoresizingMaskIntoConstraints = false
+            return mainView
     }()
     
     //MARK: - NavigationBar
@@ -138,6 +138,8 @@ class GameViewController: UIViewController {
     let hintsStack : UIStackView = {
         let hintsStack = UIStackView()
         hintsStack.axis = .horizontal
+        hintsStack.alignment = .fill
+        hintsStack.distribution = .fill
         hintsStack.spacing = 24
         hintsStack.translatesAutoresizingMaskIntoConstraints = false
         return hintsStack
@@ -148,7 +150,7 @@ class GameViewController: UIViewController {
     
     private func createHintButton(image: String) -> UIButton {
         let button = UIButton()
-        button.setImage(UIImage(named: image), for: .normal)
+        button.setBackgroundImage(UIImage(named: image), for: .normal)
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }
@@ -170,12 +172,12 @@ class GameViewController: UIViewController {
     
     private func setupUI() {
         
-        view.addSubview(backgroundImageView)
+        view.addSubview(mainView)
         NSLayoutConstraint.activate([
-            backgroundImageView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            backgroundImageView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            backgroundImageView.topAnchor.constraint(equalTo: view.topAnchor),
-            backgroundImageView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+            mainView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            mainView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            mainView.topAnchor.constraint(equalTo: view.topAnchor),
+            mainView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
         ])
         
         //MARK: - NavigationBar UI
@@ -208,10 +210,10 @@ class GameViewController: UIViewController {
         
         //MARK: - Timer UI
         
-        backgroundImageView.addSubview(timerView)
+        mainView.addSubview(timerView)
         NSLayoutConstraint.activate([
 
-            timerView.centerXAnchor.constraint(equalTo: backgroundImageView.centerXAnchor),
+            timerView.centerXAnchor.constraint(equalTo: mainView.centerXAnchor),
             timerView.centerYAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 54.5),
                         timerView.heightAnchor.constraint(equalToConstant: 45),
                         timerView.widthAnchor.constraint(equalToConstant: 91)
@@ -220,7 +222,7 @@ class GameViewController: UIViewController {
         timerView.addSubview(timerImage)
         NSLayoutConstraint.activate([
             timerImage.topAnchor.constraint(equalTo: timerView.topAnchor, constant: 10.5),
-            timerImage.leadingAnchor.constraint(equalTo: timerView.leadingAnchor, constant: 19),
+            timerImage.leadingAnchor.constraint(equalTo: timerView.leadingAnchor, constant: 17),
             timerImage.widthAnchor.constraint(equalToConstant: 24),
             timerImage.heightAnchor.constraint(equalToConstant: 24)
         ])
@@ -235,22 +237,22 @@ class GameViewController: UIViewController {
         timerCounter.attributedText = attributedText(text: "60", fontSize: 22, color: .white)
         
         //MARK: - Question Section UI
-        backgroundImageView.addSubview(questionTextView)
+        mainView.addSubview(questionTextView)
         NSLayoutConstraint.activate([
             questionTextView.topAnchor.constraint(equalTo: timerView.bottomAnchor, constant: 24),
-            questionTextView.leadingAnchor.constraint(equalTo: backgroundImageView.leadingAnchor, constant: 32),
-            questionTextView.trailingAnchor.constraint(equalTo: backgroundImageView.trailingAnchor, constant: -32),
+            questionTextView.leadingAnchor.constraint(equalTo: mainView.leadingAnchor, constant: 32),
+            questionTextView.trailingAnchor.constraint(equalTo: mainView.trailingAnchor, constant: -32),
             questionTextView.heightAnchor.constraint(equalToConstant: 147)
         ])
         questionTextView.attributedText = attributedText(text: "What year was the year, when first deodorant was invented in our life?", fontSize: 24, color: .white)
         
         //MARK: - Answers Section UI
-        backgroundImageView.addSubview(answersStack)
+        mainView.addSubview(answersStack)
         NSLayoutConstraint.activate([
 
             answersStack.topAnchor.constraint(equalTo: questionTextView.bottomAnchor, constant: 32),
-            answersStack.leadingAnchor.constraint(equalTo: backgroundImageView.leadingAnchor, constant: 32),
-            answersStack.trailingAnchor.constraint(equalTo: backgroundImageView.trailingAnchor, constant: -32)
+            answersStack.leadingAnchor.constraint(equalTo: mainView.leadingAnchor, constant: 32),
+            answersStack.trailingAnchor.constraint(equalTo: mainView.trailingAnchor, constant: -32)
         ])
         let sortedAnswerButtonsTitles = answerButtonsTitles.sorted { $0.key < $1.key }
         for (key, value) in sortedAnswerButtonsTitles {
@@ -259,10 +261,26 @@ class GameViewController: UIViewController {
         answersButtonArray.forEach { answersStack.addArrangedSubview($0)
         }
         
-        
+        //MARK: - Hints UI
+        mainView.addSubview(hintsStack)
+        NSLayoutConstraint.activate([
+            hintsStack.topAnchor.constraint(equalTo: answersStack.bottomAnchor, constant: 40),
+            hintsStack.centerXAnchor.constraint(equalTo: answersStack.centerXAnchor),
+            hintsStack.heightAnchor.constraint(equalToConstant: 64),
+//            hintsStack.leadingAnchor.constraint(equalTo: mainView.leadingAnchor, constant: 32),
+//            hintsStack.trailingAnchor.constraint(equalTo: mainView.trailingAnchor, constant: -32)
+        ])
+        hintButtonsImages.forEach {
+            hintButtons.append(createHintButton(image: $0))
+        }
+        hintButtons.forEach {
+            hintsStack.addArrangedSubview($0)
+//            $0.widthAnchor.constraint(equalToConstant: 84).isActive = true
+//            $0.heightAnchor.constraint(equalToConstant: 64).isActive = true
+        }
         
     }
-    //MARK: attributedText func
+    //MARK: func attributedText
     func attributedText(text: String, fontSize: CGFloat, color: UIColor, firstLineIntend: CGFloat = 0) -> NSAttributedString {
         let paragraphStyle = NSMutableParagraphStyle()
         paragraphStyle.firstLineHeadIndent = firstLineIntend
