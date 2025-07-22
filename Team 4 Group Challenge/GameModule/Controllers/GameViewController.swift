@@ -24,7 +24,6 @@ class GameViewController: UIViewController {
     }
     
     private func setupViews() {
-        
     }
     
     //MARK: - setConstraints
