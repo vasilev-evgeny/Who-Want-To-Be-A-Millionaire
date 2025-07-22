@@ -10,7 +10,7 @@ import UIKit
 class GameViewController: UIViewController {
 
     enum Constants {
-        
+       case ggjhgj
     }
     
     //MARK: - Create UI
