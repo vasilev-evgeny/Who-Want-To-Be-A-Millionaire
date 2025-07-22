@@ -11,7 +11,11 @@ class GameViewController: UIViewController {
 
     //MARK: - Create UI Items
     
-    let backgroundImage = UIImageView(image: UIImage(named: "backGround"))
+    let backgroundImageView : UIImageView = {
+        let backgroundImageView = UIImageView(image: UIImage(named: "backGround"))
+        backgroundImageView.translatesAutoresizingMaskIntoConstraints = false
+            return backgroundImageView
+    }()
     
     //MARK: - NavigationBar
     
@@ -49,10 +53,6 @@ class GameViewController: UIViewController {
     
     let bottomTitleLabel : UILabel = {
         let bottomTitleLabel = UILabel()
-        bottomTitleLabel.text = "$"
-        bottomTitleLabel.textColor = .white
-        bottomTitleLabel.font = UIFont.systemFont(ofSize: 19)
-        bottomTitleLabel.textAlignment = .center
         bottomTitleLabel.translatesAutoresizingMaskIntoConstraints = false
         return bottomTitleLabel
     }()
@@ -75,31 +75,38 @@ class GameViewController: UIViewController {
     
     let timerView : UIView = {
         let timerView = UIView()
-        timerView.layer.cornerRadius = 50
+        timerView.layer.cornerRadius = 22.5
+        timerView.clipsToBounds = true
         timerView.layer.backgroundColor = UIColor(red: 1, green: 1, blue: 1, alpha: 0.1).cgColor
         timerView.translatesAutoresizingMaskIntoConstraints = false
         return timerView
     }()
     
-    let timerImage = UIImageView(image: UIImage(named: "stopwatch"))
+    let timerImage : UIImageView = {
+        let timerImage = UIImageView(image: UIImage(named: "stopwatch"))
+        timerImage.translatesAutoresizingMaskIntoConstraints = false
+            return timerImage
+    }()
     
     let timerCounter : UILabel = {
         let timerCounter = UILabel()
-        timerCounter.text = "60"
-        timerCounter.font = UIFont(name: "SFCompactDisplay-Semibold", size: 24)
         timerCounter.translatesAutoresizingMaskIntoConstraints = false
         return timerCounter
     }()
     
     //MARK: - Question
-    let questionLabel : UILabel = {
-        let questionLabel = UILabel()
-        questionLabel.textAlignment = .center
-        questionLabel.textColor = .white
-        questionLabel.numberOfLines = 0
-        questionLabel.text = "Test"
-        questionLabel.translatesAutoresizingMaskIntoConstraints = false
-        return questionLabel
+    let questionTextView : UITextView = {
+        let questionTextView = UITextView()
+        questionTextView.isEditable = false
+        questionTextView.isSelectable = false
+        questionTextView.isScrollEnabled = false
+        questionTextView.clipsToBounds = true
+        questionTextView.textContainerInset = .zero
+        questionTextView.textContainer.lineFragmentPadding = 0
+        questionTextView.layer.borderWidth = 0
+        questionTextView.backgroundColor = .clear
+        questionTextView.translatesAutoresizingMaskIntoConstraints = false
+        return questionTextView
     }()
     
     //MARK: - Answers Section
@@ -112,26 +119,17 @@ class GameViewController: UIViewController {
     }()
     
     let answerButtonsTitles = ["A": "Title1", "B": "Title2", "C": "Title3", "D": "Title4"]
-    var answersButton = [UIButton]()
+    var answersButtonArray = [UIButton]()
     
     private func createAnswerButton(letter: String, title: String) -> UIButton {
         let button = UIButton()
         let titleText = NSMutableAttributedString()
-        titleText.append(
-            NSAttributedString(
-                string: "\(letter): ",
-                attributes: [.foregroundColor: UIColor(red: 225/255, green: 155/255, blue: 48/255, alpha: 1)]
-            )
-        )
-        titleText.append(
-            NSAttributedString(
-                string: title,
-                attributes: [.foregroundColor: UIColor.white]
-            )
-        )
-        button.setImage(UIImage(named: "plain_answer"), for: .normal)
-        button.setTitle(title, for: .normal)
-        button.titleLabel?.textAlignment = .left
+        titleText.append(attributedText(text: "\(letter):  ", fontSize: 18, color: UIColor(red: 225/255, green: 155/255, blue: 48/255, alpha: 1), firstLineIntend: 24))
+
+        titleText.append(attributedText(text: title, fontSize: 18, color: .white, firstLineIntend: 8))
+        button.setBackgroundImage(UIImage(named: "plain_answer"), for: .normal)
+        button.setAttributedTitle(titleText, for: .normal)
+        button.contentHorizontalAlignment = .left
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }
@@ -172,13 +170,12 @@ class GameViewController: UIViewController {
     
     private func setupUI() {
         
-        view.addSubview(backgroundImage)
-        backgroundImage.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(backgroundImageView)
         NSLayoutConstraint.activate([
-            backgroundImage.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            backgroundImage.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            backgroundImage.topAnchor.constraint(equalTo: view.topAnchor),
-            backgroundImage.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+            backgroundImageView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            backgroundImageView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            backgroundImageView.topAnchor.constraint(equalTo: view.topAnchor),
+            backgroundImageView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
         ])
         
         //MARK: - NavigationBar UI
@@ -207,11 +204,75 @@ class GameViewController: UIViewController {
         labelStack.addArrangedSubview(bottomTitleLabel)
         
         navigationItem.titleView = labelStack
+        bottomTitleLabel.attributedText = attributedText(text: "$", fontSize: 19, color: .white)
+        
+        //MARK: - Timer UI
+        
+        backgroundImageView.addSubview(timerView)
+        NSLayoutConstraint.activate([
+
+            timerView.centerXAnchor.constraint(equalTo: backgroundImageView.centerXAnchor),
+            timerView.centerYAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 54.5),
+                        timerView.heightAnchor.constraint(equalToConstant: 45),
+                        timerView.widthAnchor.constraint(equalToConstant: 91)
+                        ])
+        
+        timerView.addSubview(timerImage)
+        NSLayoutConstraint.activate([
+            timerImage.topAnchor.constraint(equalTo: timerView.topAnchor, constant: 10.5),
+            timerImage.leadingAnchor.constraint(equalTo: timerView.leadingAnchor, constant: 19),
+            timerImage.widthAnchor.constraint(equalToConstant: 24),
+            timerImage.heightAnchor.constraint(equalToConstant: 24)
+        ])
+        
+        timerView.addSubview(timerCounter)
+        NSLayoutConstraint.activate([
+            timerCounter.topAnchor.constraint(equalTo: timerView.topAnchor, constant: 8),
+            timerCounter.leadingAnchor.constraint(equalTo: timerImage.trailingAnchor, constant: 8),
+            timerCounter.widthAnchor.constraint(equalToConstant: 27),
+            timerCounter.heightAnchor.constraint(equalToConstant: 29)
+        ])
+        timerCounter.attributedText = attributedText(text: "60", fontSize: 22, color: .white)
+        
+        //MARK: - Question Section UI
+        backgroundImageView.addSubview(questionTextView)
+        NSLayoutConstraint.activate([
+            questionTextView.topAnchor.constraint(equalTo: timerView.bottomAnchor, constant: 24),
+            questionTextView.leadingAnchor.constraint(equalTo: backgroundImageView.leadingAnchor, constant: 32),
+            questionTextView.trailingAnchor.constraint(equalTo: backgroundImageView.trailingAnchor, constant: -32),
+            questionTextView.heightAnchor.constraint(equalToConstant: 147)
+        ])
+        questionTextView.attributedText = attributedText(text: "What year was the year, when first deodorant was invented in our life?", fontSize: 24, color: .white)
         
         //MARK: - Answers Section UI
-        for (key, value) in answerButtonsTitles {
-            answersButton.append(createAnswerButton(letter: key, title: value))
+        backgroundImageView.addSubview(answersStack)
+        NSLayoutConstraint.activate([
+
+            answersStack.topAnchor.constraint(equalTo: questionTextView.bottomAnchor, constant: 32),
+            answersStack.leadingAnchor.constraint(equalTo: backgroundImageView.leadingAnchor, constant: 32),
+            answersStack.trailingAnchor.constraint(equalTo: backgroundImageView.trailingAnchor, constant: -32)
+        ])
+        let sortedAnswerButtonsTitles = answerButtonsTitles.sorted { $0.key < $1.key }
+        for (key, value) in sortedAnswerButtonsTitles {
+            answersButtonArray.append(createAnswerButton(letter: key, title: value))
         }
+        answersButtonArray.forEach { answersStack.addArrangedSubview($0)
+        }
+        
+        
+        
+    }
+    //MARK: attributedText func
+    func attributedText(text: String, fontSize: CGFloat, color: UIColor, firstLineIntend: CGFloat = 0) -> NSAttributedString {
+        let paragraphStyle = NSMutableParagraphStyle()
+        paragraphStyle.firstLineHeadIndent = firstLineIntend
+        paragraphStyle.alignment = .center
+        let attributes : [NSAttributedString.Key: Any] = [
+            .font: UIFont.systemFont(ofSize: fontSize, weight: .semibold),
+            .foregroundColor: color,
+            .paragraphStyle: paragraphStyle
+        ]
+        return NSAttributedString(string: text, attributes: attributes)
         
     }
 }
