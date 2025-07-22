@@ -9,25 +9,25 @@ import UIKit
 
 class GameViewController: UIViewController {
 
-    //MARK: - Create UI
+    //MARK: - Create UI Items
     
     let backgroundImage = UIImageView(image: UIImage(named: "backGround"))
     
     //MARK: - NavigationBar
-    let navigationBar: UINavigationBar = {
-        let navigationBar = UINavigationBar()
-        navigationBar.barTintColor = .clear
-        return navigationBar
-    }()
     
     let backButton : UIButton = {
         let backButton = UIButton()
-        backButton.backgroundColor = .clear
         backButton.setImage(UIImage(named: "arrow_back"), for: .normal)
         backButton.translatesAutoresizingMaskIntoConstraints = false
         return backButton
     }()
     
+    let backButtonContainter : UIView = {
+        let backButtonContainter = UIView()
+        backButtonContainter.translatesAutoresizingMaskIntoConstraints = false
+        return backButtonContainter
+    }()
+
     let labelStack : UIStackView = {
         let labelStack = UIStackView()
         labelStack.axis = .vertical
@@ -38,7 +38,7 @@ class GameViewController: UIViewController {
     
     let topTitleLabel : UILabel = {
         let topTitleLabel = UILabel()
-        topTitleLabel.text = "Question #"
+        topTitleLabel.text = "QUESTION #"
         topTitleLabel.textColor = .white
         topTitleLabel.font = UIFont.systemFont(ofSize: 18)
         topTitleLabel.alpha = 0.5
@@ -63,6 +63,12 @@ class GameViewController: UIViewController {
         chartButton.setImage(UIImage(named: "bar_chart"), for: .normal)
         chartButton.translatesAutoresizingMaskIntoConstraints = false
         return chartButton
+    }()
+    
+    let chartButtonContainter : UIView = {
+        let chartButtonContainter = UIView()
+        chartButtonContainter.translatesAutoresizingMaskIntoConstraints = false
+        return chartButtonContainter
     }()
     
     //MARK: - Timer
@@ -157,14 +163,52 @@ class GameViewController: UIViewController {
         setupUI()
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        navigationController?.setNavigationBarHidden(false, animated: true)
+    }
+    
+    //MARK: - Setup UI
+    
     private func setupUI() {
         
         view.addSubview(backgroundImage)
+        backgroundImage.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            backgroundImage.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            backgroundImage.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            backgroundImage.topAnchor.constraint(equalTo: view.topAnchor),
+            backgroundImage.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+        ])
         
+        //MARK: - NavigationBar UI
         
+        backButtonContainter.addSubview(backButton)
+        NSLayoutConstraint.activate([
+            backButtonContainter.heightAnchor.constraint(equalToConstant: 44),
+            backButtonContainter.widthAnchor.constraint(equalToConstant: 32),
+            
+            backButton.topAnchor.constraint(equalTo: backButtonContainter.topAnchor),
+            backButton.centerXAnchor.constraint(equalTo: backButtonContainter.centerXAnchor),
+        ])
+            navigationItem.leftBarButtonItem = UIBarButtonItem(customView: backButtonContainter)
         
+        chartButtonContainter.addSubview(chartButton)
+        NSLayoutConstraint.activate([
+            chartButtonContainter.heightAnchor.constraint(equalToConstant: 44),
+            chartButtonContainter.widthAnchor.constraint(equalToConstant: 32),
+            
+            chartButton.topAnchor.constraint(equalTo: chartButtonContainter.topAnchor),
+            chartButton.centerXAnchor.constraint(equalTo: chartButtonContainter.centerXAnchor),
+        ])
+        navigationItem.rightBarButtonItem = UIBarButtonItem(customView: chartButtonContainter)
         
+        labelStack.addArrangedSubview(topTitleLabel)
+        labelStack.addArrangedSubview(bottomTitleLabel)
         
+        navigationItem.titleView = labelStack
+        
+        //MARK: - Answers Section UI
         for (key, value) in answerButtonsTitles {
             answersButton.append(createAnswerButton(letter: key, title: value))
         }
