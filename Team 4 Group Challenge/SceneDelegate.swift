@@ -20,7 +20,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         guard let windowScene = (scene as? UIWindowScene) else { return }
         
         let window: UIWindow = .init(windowScene: windowScene)
-        window.rootViewController = AnswerViewController(answers: Answer.getAnswerList()) //Здесь пишем свой ViewController, чтобы запускать только его
+
+        window.rootViewController = SplashViewController() //Здесь пишем свой ViewController, чтобы запускать только его
         self.window = window
         window.makeKeyAndVisible()
     }
