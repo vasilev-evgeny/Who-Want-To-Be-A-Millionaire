@@ -1,0 +1,6 @@
+# macOS системные файлы
+.DS_Store
+
+# Xcode пользовательские данные
+**/xcuserdata/*
+*.xcuserstate
