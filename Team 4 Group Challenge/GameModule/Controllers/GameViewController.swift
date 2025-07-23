@@ -48,6 +48,7 @@ class GameViewController: UIViewController {
         topTitleLabel.font = UIFont.systemFont(ofSize: 18)
         topTitleLabel.alpha = 0.5
         topTitleLabel.textAlignment = .center
+        topTitleLabel.backgroundColor = .clear
         topTitleLabel.translatesAutoresizingMaskIntoConstraints = false
         return topTitleLabel
     }()
@@ -115,6 +116,7 @@ class GameViewController: UIViewController {
         let answersStack = UIStackView()
         answersStack.axis = .vertical
         answersStack.spacing = 16
+        answersStack.distribution = .fillEqually
         answersStack.translatesAutoresizingMaskIntoConstraints = false
         return answersStack
     }()
@@ -252,7 +254,8 @@ class GameViewController: UIViewController {
             NSLayoutConstraint.activate([
                 answersStack.topAnchor.constraint(equalTo: questionTextView.bottomAnchor, constant: 32),
                 answersStack.leadingAnchor.constraint(equalTo: mainView.leadingAnchor, constant: 32),
-                answersStack.trailingAnchor.constraint(equalTo: mainView.trailingAnchor, constant: -32)
+                answersStack.trailingAnchor.constraint(equalTo: mainView.trailingAnchor, constant: -32),
+                answersStack.heightAnchor.constraint(equalToConstant: 272)
             ])
             let sortedAnswerButtonsTitles = answerButtonsTitles.sorted { $0.key < $1.key }
             for (key, value) in sortedAnswerButtonsTitles {
