@@ -20,9 +20,17 @@ class SplashViewController: BaseViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
         setupViews()
         setConstraints()
+        setTimer()
+        navigationController?.isNavigationBarHidden = true
+    }
+    
+    private func setTimer() {
+        Timer.scheduledTimer(withTimeInterval: 2.0, repeats: false) { timer in
+            let controller = WelcomeViewController()
+            self.navigationController?.pushViewController(controller, animated: true)
+        }
     }
     
     private func setupViews() {

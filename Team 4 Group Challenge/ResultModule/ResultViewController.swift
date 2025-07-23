@@ -63,7 +63,7 @@ class ResultViewController: BaseViewController {
         let stack = UIStackView(arrangedSubviews:  [startNewGameButton, goToMainScreenButton])
         stack.axis = .vertical
         stack.translatesAutoresizingMaskIntoConstraints = false
-        stack.spacing = 8
+        stack.spacing = 16
         
         [startNewGameButton, goToMainScreenButton].forEach {
             $0.translatesAutoresizingMaskIntoConstraints = false
@@ -123,8 +123,9 @@ class ResultViewController: BaseViewController {
         
         buttonsStack.topAnchor.constraint(equalTo: resultInfoStackView.bottomAnchor, constant: 124).isActive = true
         buttonsStack.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
-        buttonsStack.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -16).isActive = true
-        buttonsStack.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 16).isActive = true
+        buttonsStack.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -32).isActive = true
+        buttonsStack.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 32).isActive = true
+        buttonsStack.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -60).isActive = true
         
     }
 
