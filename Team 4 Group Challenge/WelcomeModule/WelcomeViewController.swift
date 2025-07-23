@@ -61,6 +61,7 @@ class WelcomeViewController: UIViewController {
     }(UILabel())
     
     
+    
     //MARK: - Action Func
     
     @objc func rulesButtonTapped() {
