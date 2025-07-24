@@ -17,7 +17,7 @@ class WelcomeViewController: UIViewController {
         $0.setImage(UIImage(named: "helpBtn"), for: .normal)
         $0.addTarget(self, action: #selector(rulesButtonTapped), for: .touchUpInside)
         return $0
-    }(UIButton())
+    } (UIButton())
     
     lazy var buttonNewGame: UIButton = {
         $0.translatesAutoresizingMaskIntoConstraints = false
@@ -65,7 +65,12 @@ class WelcomeViewController: UIViewController {
     
     @objc func rulesButtonTapped() {
         let controller = RulesViewController()
+        controller.modalPresentationStyle = .overCurrentContext
+        controller.modalTransitionStyle = .coverVertical
         self.navigationController?.pushViewController(controller, animated: true)
+        controller.navigationController?.setNavigationBarHidden(true, animated: false)
+//        controller.navigationItem.hidesBackButton = true
+        
     }
     
     //MARK: - Lifecycle
@@ -75,11 +80,13 @@ class WelcomeViewController: UIViewController {
         setupViews()
         setConstraints()
     }
-    
+
     private func setupViews() {
         view.backgroundColor = .systemPink
         view.addSubview(bgImage)
-        view.addSubview(buttonRules)
+        
+        navigationItem.rightBarButtonItem = UIBarButtonItem(customView: buttonRules)
+//        view.addSubview(buttonRules)
         view.addSubview(logoImage)
         view.addSubview(labelText)
         view.addSubview(buttonNewGame)
@@ -98,9 +105,9 @@ class WelcomeViewController: UIViewController {
             bgImage.bottomAnchor.constraint(equalTo: view.bottomAnchor),
             
             
-            buttonRules.topAnchor.constraint(equalTo: view.topAnchor, constant: 56),
-            buttonRules.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 323),
-            buttonRules.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
+//            buttonRules.topAnchor.constraint(equalTo: view.topAnchor, constant: 56),
+//            buttonRules.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 323),
+//            buttonRules.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
             
             
             logoImage.topAnchor.constraint(equalTo: view.topAnchor, constant: 168),
