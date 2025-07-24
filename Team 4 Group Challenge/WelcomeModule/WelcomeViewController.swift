@@ -7,8 +7,7 @@
 import UIKit
 
 class WelcomeViewController: UIViewController {
-    
-    
+        
     //MARK: - Create UI
     
     //Buttons
@@ -17,7 +16,7 @@ class WelcomeViewController: UIViewController {
         $0.setImage(UIImage(named: "helpBtn"), for: .normal)
         $0.addTarget(self, action: #selector(rulesButtonTapped), for: .touchUpInside)
         return $0
-    }(UIButton())
+    } (UIButton())
     
     lazy var buttonNewGame: UIButton = {
         $0.translatesAutoresizingMaskIntoConstraints = false
@@ -25,6 +24,18 @@ class WelcomeViewController: UIViewController {
         $0.setBackgroundImage(UIImage(named: "yellowBtn"), for: .normal)
         $0.titleLabel?.font = UIFont.boldSystemFont(ofSize: 24)
         $0.setTitleColor(.white, for: .normal)
+        $0.addTarget(self, action: #selector(newGameButtonTapped), for: .touchUpInside)
+        return $0
+    }(UIButton())
+    
+    lazy var buttonContinueGame: UIButton = {
+        $0.translatesAutoresizingMaskIntoConstraints = false
+        $0.setTitle("Continue game", for: .normal)
+        $0.setBackgroundImage(UIImage(named:"yellowBtn"), for: .normal)
+        $0.titleLabel?.font = UIFont.boldSystemFont(ofSize: 24)
+        $0.setTitleColor(.white, for: .normal)
+        $0.addTarget(self, action: #selector(continueButtonTapped), for: .touchUpInside)
+        $0.isHidden = true
         return $0
     }(UIButton())
     
@@ -63,9 +74,38 @@ class WelcomeViewController: UIViewController {
     
     //MARK: - Action Func
     
-    @objc func rulesButtonTapped() {
+    @objc func rulesButtonTapped(sender : UIButton) {
+        sender.buttonTappedAnimate()
         let controller = RulesViewController()
+        controller.modalPresentationStyle = .overCurrentContext
+        controller.modalTransitionStyle = .coverVertical
         self.navigationController?.pushViewController(controller, animated: true)
+        controller.navigationController?.setNavigationBarHidden(true, animated: false)
+    }
+    
+    @objc func continueButtonTapped(sender : UIButton) {
+        sender.buttonTappedAnimate()
+        let gameVC = GameViewController()
+        self.navigationController?.pushViewController(gameVC, animated: true)
+    }
+    
+    @objc func newGameButtonTapped(sender : UIButton) {
+        sender.buttonTappedAnimate()
+        GameBrain.shared.isGameInProgress = true
+        print(GameBrain.shared.isGameInProgress)
+        GameBrain.shared.refreshGame()
+        let gameVC = GameViewController()
+        self.navigationController?.pushViewController(gameVC, animated: true)
+    }
+    
+    func checkGameStatus() {
+        switch GameBrain.shared.isGameInProgress {
+        case true :
+            buttonContinueGame.isHidden = false
+            buttonNewGame.setBackgroundImage(UIImage(named: "BlueButton"), for: .normal)
+        case false:
+            buttonContinueGame.isHidden = true
+        }
     }
     
     //MARK: - Lifecycle
@@ -74,15 +114,19 @@ class WelcomeViewController: UIViewController {
         super.viewDidLoad()
         setupViews()
         setConstraints()
+        checkGameStatus()
     }
     
     private func setupViews() {
         view.backgroundColor = .systemPink
         view.addSubview(bgImage)
+        
+        navigationItem.rightBarButtonItem = UIBarButtonItem(customView: buttonRules)
         view.addSubview(buttonRules)
         view.addSubview(logoImage)
         view.addSubview(labelText)
         view.addSubview(buttonNewGame)
+        view.addSubview(buttonContinueGame)
     }
     
     //MARK: - setConstraints
@@ -113,10 +157,15 @@ class WelcomeViewController: UIViewController {
             labelText.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 58),
             labelText.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -58),
             
-            
             buttonNewGame.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -32),
             buttonNewGame.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 32),
-            buttonNewGame.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -109)
+            buttonNewGame.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -109),
+            
+            buttonContinueGame.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -32),
+            buttonContinueGame.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 32),
+            buttonContinueGame.bottomAnchor.constraint(equalTo: buttonNewGame.topAnchor, constant: -20),
+            buttonContinueGame.heightAnchor.constraint(equalTo: buttonNewGame.heightAnchor),
+            
         ])
         
     }
