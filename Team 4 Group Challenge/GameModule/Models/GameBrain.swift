@@ -122,4 +122,36 @@ final class GameBrain {
     var helpButtonIsEnabled = true //cостояние кнопок подсказок
     var audienceButtonIsEnabled = true //cостояние кнопок подсказок
     var mistakeButtonIsEnabled = true //cостояние кнопок подсказок
+    
+    //проверка прогресса игры
+    var isGameInProgress: Bool {
+        return !isGameOver && currentQuestion > 0
+    }
+    
+    //сбрасывает игру
+    func resetGame() {
+        currentQuestion = 0
+        isGameOver = false
+        currentPrize = 0
+        guaranteedPrize = 0
+    }
+    
+    // сохраняет прогресс
+    func saveGameState() {
+        UserDefaults.standard.set(currentQuestion, forKey: "currentQuestion")
+        UserDefaults.standard.set(isGameOver, forKey: "isGameOver")
+       
+    }
+    // загружает сохр. данные
+    func loadGameState() {
+        currentQuestion = UserDefaults.standard.integer(forKey: "currentQuestion")
+        isGameOver = UserDefaults.standard.bool(forKey: "isGameOver")
+       
+    }
+    
+  
+
 }
+
+
+

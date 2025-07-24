@@ -77,21 +77,26 @@ class WelcomeViewController: UIViewController {
     //MARK: - Action Func
     
     @objc func rulesButtonTapped() {
+        
         let controller = RulesViewController()
         self.navigationController?.pushViewController(controller, animated: true)
     }
     
     @objc func continueButtonTapped() {
-        let controller = GameViewController()
-        self.navigationController?.pushViewController(controller, animated: true)
+        guard GameBrain.shared.isGameInProgress else { return }
+        let gameVC = GameViewController()
+        self.navigationController?.pushViewController(gameVC, animated: true)
+
     }
     
     @objc func newGameButtonTapped() {
-        let controller = GameViewController()
-        self.navigationController?.pushViewController(controller, animated: true)
-        
-        UserDefaults.standard.set(true, forKey: "gameInProgress")
+        GameBrain.shared.resetGame()
+        let gameVC = GameViewController()
+        self.navigationController?.pushViewController(gameVC, animated: true)
+        //UserDefaults.standard.set(true, forKey: "gameInProgress")
     }
+    
+    
     
     
     //MARK: - Lifecycle
@@ -102,13 +107,23 @@ class WelcomeViewController: UIViewController {
         setConstraints()
         checkGameStatus()
     }
+        
+        
+    
+    
     
     private func checkGameStatus() {
-        if UserDefaults.standard.bool(forKey: "gameInProgress") {
+        if GameBrain.shared.isGameInProgress {
             buttonNewGame.setBackgroundImage(UIImage(named: "BlueButton"), for: .normal)
             buttonContinueGame.isHidden = false
+        }else{
+            buttonNewGame.setBackgroundImage(UIImage(named: "yellowBtn"), for: .normal)
+            buttonContinueGame.isHidden = true
         }
+
     }
+    
+    
     
     
     private func setupViews() {
