@@ -7,9 +7,7 @@
 import UIKit
 
 class WelcomeViewController: UIViewController {
-    
-    let game = GameBrain()
-    
+        
     //MARK: - Create UI
     
     //Buttons
@@ -26,7 +24,7 @@ class WelcomeViewController: UIViewController {
         $0.setBackgroundImage(UIImage(named: "yellowBtn"), for: .normal)
         $0.titleLabel?.font = UIFont.boldSystemFont(ofSize: 24)
         $0.setTitleColor(.white, for: .normal)
-        $0.addTarget(self, action: #selector(continueButtonTapped), for: .touchUpInside)
+        $0.addTarget(self, action: #selector(newGameButtonTapped), for: .touchUpInside)
         return $0
     }(UIButton())
     
@@ -83,8 +81,6 @@ class WelcomeViewController: UIViewController {
         controller.modalTransitionStyle = .coverVertical
         self.navigationController?.pushViewController(controller, animated: true)
         controller.navigationController?.setNavigationBarHidden(true, animated: false)
-        //        controller.navigationItem.hidesBackButton = true
-        
     }
     
     @objc func continueButtonTapped(sender : UIButton) {
@@ -95,8 +91,8 @@ class WelcomeViewController: UIViewController {
     
     @objc func newGameButtonTapped(sender : UIButton) {
         sender.buttonTappedAnimate()
-        game.isGameInProgress = true
-        print("что-то")
+        GameBrain.shared.isGameInProgress = true
+        print(GameBrain.shared.isGameInProgress)
         GameBrain.shared.refreshGame()
         let gameVC = GameViewController()
         self.navigationController?.pushViewController(gameVC, animated: true)
