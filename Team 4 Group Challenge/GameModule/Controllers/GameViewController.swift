@@ -8,7 +8,7 @@ import UIKit
 
 class GameViewController: UIViewController {
     
-    let game = GameBrain()
+    let game = GameBrain.shared
     
     //MARK: - Create UI Items
     
@@ -244,7 +244,7 @@ class GameViewController: UIViewController {
                 timerCounter.widthAnchor.constraint(equalToConstant: 27),
                 timerCounter.heightAnchor.constraint(equalToConstant: 29)
             ])
-            timerCounter.attributedText = attributedText(text: "60", fontSize: 22, color: .white)
+            timerCounter.attributedText = attributedText(text: "32", fontSize: 22, color: .white)
             
             //MARK: - Question Section UI
             mainView.addSubview(questionTextView)

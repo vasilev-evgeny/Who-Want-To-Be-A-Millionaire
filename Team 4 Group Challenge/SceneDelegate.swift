@@ -24,7 +24,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let answerVC = AnswerModule(answers: answers)
         let splashVC = SplashViewController()
         let gameVC = GameViewController()
-        let navController = UINavigationController(rootViewController: gameVC)
+        let navController = UINavigationController(rootViewController: splashVC)
         window.rootViewController = navController
         navController.setNavigationBarHidden(true, animated: false)
         window.makeKeyAndVisible()

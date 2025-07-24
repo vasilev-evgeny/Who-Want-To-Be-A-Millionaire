@@ -8,6 +8,8 @@ import UIKit
 
 final class GameBrain {
     
+    static let shared = GameBrain()
+    
     var easy: [Question] = [
         Question(
             question: "Какой город называют 'Городом любви'?",
@@ -34,7 +36,7 @@ final class GameBrain {
             answers: ["Мельбурн", "Окленд", "Сидней", "Брисбен"],
             correctAnswer: "Сидней"
         )
-    ].shuffled()
+    ]
     
     var medium: [Question] = [
         Question(
@@ -62,7 +64,7 @@ final class GameBrain {
             answers: ["Чикаго", "Бостон", "Торонто", "Детройт"],
             correctAnswer: "Чикаго"
         )
-    ].shuffled()
+    ]
     
     var hard: [Question] = [
         Question(
@@ -90,7 +92,7 @@ final class GameBrain {
             answers: ["Бразилиа", "Канберра", "Астана", "Исламабад"],
             correctAnswer: "Бразилиа"
         )
-    ].shuffled()
+    ]
     
     private let questionsWorth = [
         "500",
@@ -162,4 +164,5 @@ final class GameBrain {
 //            newGameQuestion.append(contentsOf: hard)
 //        }
 //    }
+    var isGameInProgress : Bool = false
 }
