@@ -148,6 +148,7 @@ class RulesViewController: UIViewController {
     @objc func closeButtonTapped() {
         let controller = WelcomeViewController()
         self.navigationController?.pushViewController(controller, animated: true)
+        controller.navigationItem.hidesBackButton = true
     }
     
     //MARK: - Life Cycle
