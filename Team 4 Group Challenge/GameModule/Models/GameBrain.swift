@@ -136,6 +136,11 @@ final class GameBrain {
     var audienceButtonIsEnabled = true //cостояние кнопок подсказок
     var mistakeButtonIsEnabled = true //cостояние кнопок подсказок
     
+    var hintButtons = [
+        ("50_50", true),
+        ("audience", true),
+        ("call", true)
+    ]
     
     func refreshGame() {
         self.easy = easy.shuffled()

@@ -14,6 +14,7 @@ class GameViewController: UIViewController {
     
     let mainView : UIImageView = {
         let mainView = UIImageView(image: UIImage(named: "Background"))
+        mainView.isUserInteractionEnabled = true
         mainView.translatesAutoresizingMaskIntoConstraints = false
         return mainView
     }()
@@ -110,7 +111,7 @@ class GameViewController: UIViewController {
     }()
     
     //MARK: - Answers Section
-    let answersStack : UIStackView = {
+    var answersStack : UIStackView = {
         let answersStack = UIStackView()
         answersStack.axis = .vertical
         answersStack.spacing = 16
@@ -130,13 +131,13 @@ class GameViewController: UIViewController {
         button.setBackgroundImage(UIImage(named: "BlueButton"), for: .normal)
         button.setAttributedTitle(titleText, for: .normal)
         button.contentHorizontalAlignment = .left
-        button.isUserInteractionEnabled = true
+        button.addTarget(self, action: #selector(answerButtonPressed), for: .touchUpInside)
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }
     
     //MARK: - Hints Section
-    let hintsStack : UIStackView = {
+    var hintsStack : UIStackView = {
         let hintsStack = UIStackView()
         hintsStack.axis = .horizontal
         hintsStack.alignment = .fill
@@ -146,12 +147,14 @@ class GameViewController: UIViewController {
         return hintsStack
     }()
     
-    let hintButtonsImages = ["50_50", "audience", "call"]
+    
     var hintButtons = [UIButton]()
     
-    private func createHintButton(image: String) -> UIButton {
+    private func createHintButton(image: String, state: Bool) -> UIButton {
         let button = UIButton()
         button.setBackgroundImage(UIImage(named: image), for: .normal)
+        button.isEnabled = state
+        button.alpha = state ? 1 : 0.5
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }
@@ -170,13 +173,6 @@ class GameViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(false, animated: true)
-    }
-    
-    override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
-        answersStack.subviews.forEach {
-            print("\($0): \($0.frame)")
-        }
     }
     
         //MARK: - Setup UI
@@ -213,7 +209,7 @@ class GameViewController: UIViewController {
                 chartButton.topAnchor.constraint(equalTo: chartButtonContainter.topAnchor),
                 chartButton.centerXAnchor.constraint(equalTo: chartButtonContainter.centerXAnchor),
             ])
-            chartButton.addTarget(self, action: #selector(awakeAnswerModule), for: .touchUpInside)
+            chartButton.addTarget(self, action: #selector(pushChartButton), for: .touchUpInside)
             navigationItem.rightBarButtonItem = UIBarButtonItem(customView: chartButtonContainter)
             
             labelStack.addArrangedSubview(topTitleLabel)
@@ -274,9 +270,7 @@ class GameViewController: UIViewController {
                 answersButtonArray.append(createAnswerButton(letter: key, title: value))
             }
             answersButtonArray.forEach {
-                $0.addTarget(self, action: #selector(answerButtonPressed), for: .touchUpInside)
                 answersStack.addArrangedSubview($0)
-                
             }
            
             //MARK: - Hints UI
@@ -286,8 +280,8 @@ class GameViewController: UIViewController {
                 hintsStack.centerXAnchor.constraint(equalTo: answersStack.centerXAnchor),
                 hintsStack.heightAnchor.constraint(equalToConstant: 64)
             ])
-            hintButtonsImages.forEach {
-                hintButtons.append(createHintButton(image: $0))
+            game.hintButtons.forEach {
+                hintButtons.append(createHintButton(image: $0.0, state: $0.1))
             }
             hintButtons.forEach {
                 hintsStack.addArrangedSubview($0)
@@ -315,7 +309,7 @@ class GameViewController: UIViewController {
         targetVC.navigationItem.hidesBackButton = true
     }
     
-    @objc func awakeAnswerModule() {
+    @objc func pushChartButton() {
         let targetVC = AnswerModule(answers: Answer.getAnswerList())
         self.navigationController?.pushViewController(targetVC, animated: true)
         targetVC.navigationItem.hidesBackButton = true
@@ -325,36 +319,72 @@ class GameViewController: UIViewController {
     }
     
     @objc func answerButtonPressed(_ sender: Button) {
-        print("Button pressed")
         sender.setBackgroundImage(UIImage(named: "YellowButton"), for: .normal)
-        if sender.titleText.hasSuffix(game.sharedGameQuestions[game.currentQuestion].correctAnswer) {
-            sender.setBackgroundImage(UIImage(named: "right_answer"), for: .normal)
-            game.guaranteedPrize =  (game.currentQuestion + 1) % 5 == 0 ? game.currentPrize : game.guaranteedPrize
-            
-            if game.currentQuestion == (game.sharedGameQuestions.count - 1) {
-                self.gameOver()
-            } else {
-                game.currentQuestion += 1
+        guard let title = sender.currentAttributedTitle?.string else { return }
+        
+        
+        let isCorrectAnswer = title.hasSuffix(game.sharedGameQuestions[game.currentQuestion].correctAnswer)
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+            if isCorrectAnswer {
+                sender.setBackgroundImage(UIImage(named: "right_answer"), for: .normal)
+                sender.blink()
+                DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+                    self.game.guaranteedPrize =  (self.game.currentQuestion + 1) % 5 == 0 ? self.game.currentPrize : self.game.guaranteedPrize
+                    self.awakeAnswerModule()
+                    if self.game.currentQuestion == (self.game.sharedGameQuestions.count - 1) {
+                        self.gameOver()
+                    } else {
+                        self.game.currentQuestion += 1
+                        self.clearStack(for: &self.answersStack)
+                        
+                        self.clearStack(for: &self.hintsStack)
+                        self.answersButtonArray = []
+                        self.hintButtons = []
+                        self.setupUI()
+                        
+                    }
+                }
+                
+            }
+            else {
+                sender.setBackgroundImage(UIImage(named: "wrong_answer"), for: .normal)
+                DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+                    self.gameOver()
+                }
             }
         }
-        else {
-            sender.setBackgroundImage(UIImage(named: "wrong_answer"), for: .normal)
-            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                self.gameOver()
-            }
-        }
+
     }
     
-//    func awakeAnswerModule() {
-//        let targetVC = AnswerModule(Answer.getAnswerList())
-//        self.navigationController?.pushViewController(targetVC, animated: true)
-//        targetVC.navigationItem.hidesBackButton = true
-//    }
+    func awakeAnswerModule() {
+        let targetVC = AnswerModule(answers: Answer.getAnswerList())
+        self.navigationController?.pushViewController(targetVC, animated: true)
+        targetVC.navigationItem.hidesBackButton = true
+        DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
+            self.navigationController?.popViewController(animated: true)
+        }
+        
+    }
     
     func gameOver() {
         let targetVC = ResultViewController()
         self.navigationController?.pushViewController(targetVC, animated: true)
         targetVC.navigationItem.hidesBackButton = true
     }
+    
+    func clearStack(for stack: inout UIStackView) {
+        for subview in stack.arrangedSubviews {
+            stack.removeArrangedSubview(subview)
+            subview.removeFromSuperview()
+        }
+    }
 }
 
+extension UIView {
+    func blink(duration: TimeInterval = 0.5, delay: TimeInterval = 0.0, alpha: CGFloat = 0.0) {
+        UIView.animate(withDuration: duration, delay: delay, options: [.curveEaseInOut, .repeat, .autoreverse]) {
+            self.alpha = alpha
+        }
+    }
+}
