@@ -6,7 +6,7 @@
 //
 import UIKit
 
-class GameBrain {
+final class GameBrain {
     
     var easy: [Question] = [
         Question(
@@ -93,7 +93,7 @@ class GameBrain {
     ]
     
     private var newGameQuestion = [Question]()
-
+    
     func createQuestionArray() {
         if newGameQuestion.isEmpty {
             easy.shuffle()
@@ -104,4 +104,22 @@ class GameBrain {
             newGameQuestion.append(contentsOf: hard)
         }
     }
+    
+    static let shared = GameBrain()
+    
+    var currentQuestion = 0 // номер текущего вопроса, +1 к нему делаем когда кнопку НАЗАД нажимает на AnswerVC,его же можно привязать к indexPath в UITableViewCell, чтобы красить нужную по порядковому номеру ячейку
+    
+    var isAnswerCorrect = true // переменная чтобы проверять правильно ли ответил юзер или нет
+    
+    var isGameOver = false //переменная чтобы чекать, закончилась ли игра
+    
+    var currentPrize: Int = 0 //переменная для текущего выигрыша
+    
+    var guaranteedPrize: Int = 0 //переменная для несгораемой суммы
+    
+    var isWalkAwayAvailable: Bool = true //переменная проверить, можно ли забрать деньги досрочно
+    
+    var helpButtonIsEnabled = true //cостояние кнопок подсказок
+    var audienceButtonIsEnabled = true //cостояние кнопок подсказок
+    var mistakeButtonIsEnabled = true //cостояние кнопок подсказок
 }
