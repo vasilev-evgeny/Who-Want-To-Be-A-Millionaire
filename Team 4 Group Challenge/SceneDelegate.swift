@@ -24,8 +24,11 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let answerVC = AnswerViewController(answers: answers)
         let splashVC = SplashViewController()
         let gameVC = GameViewController()
+        let welcomeVC = WelcomeViewController()
+        let navController2 = UINavigationController(rootViewController: welcomeVC)
+        navController2.navigationBar.isHidden = true
         let navController = UINavigationController(rootViewController: gameVC)
-        window.rootViewController = navController //Здесь пишем свой ViewController, чтобы запускать только его
+        window.rootViewController = navController2 //Здесь пишем свой ViewController, чтобы запускать только его
         self.window = window
         window.makeKeyAndVisible()
     }

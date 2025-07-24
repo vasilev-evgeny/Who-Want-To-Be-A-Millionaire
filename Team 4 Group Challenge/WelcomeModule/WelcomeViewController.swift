@@ -25,6 +25,18 @@ class WelcomeViewController: UIViewController {
         $0.setBackgroundImage(UIImage(named: "yellowBtn"), for: .normal)
         $0.titleLabel?.font = UIFont.boldSystemFont(ofSize: 24)
         $0.setTitleColor(.white, for: .normal)
+        $0.addTarget(self, action: #selector(newGameButtonTapped), for: .touchUpInside)
+        return $0
+    }(UIButton())
+    
+    lazy var buttonContinueGame: UIButton = {
+        $0.translatesAutoresizingMaskIntoConstraints = false
+        $0.setTitle("Continue game", for: .normal)
+        $0.setBackgroundImage(UIImage(named:"yellowBtn"), for: .normal)
+        $0.titleLabel?.font = UIFont.boldSystemFont(ofSize: 24)
+        $0.setTitleColor(.white, for: .normal)
+        $0.addTarget(self, action: #selector(continueButtonTapped), for: .touchUpInside)
+        $0.isHidden = true
         return $0
     }(UIButton())
     
@@ -69,13 +81,35 @@ class WelcomeViewController: UIViewController {
         self.navigationController?.pushViewController(controller, animated: true)
     }
     
+    @objc func continueButtonTapped() {
+        let controller = GameViewController()
+        self.navigationController?.pushViewController(controller, animated: true)
+    }
+    
+    @objc func newGameButtonTapped() {
+        let controller = GameViewController()
+        self.navigationController?.pushViewController(controller, animated: true)
+        
+        UserDefaults.standard.set(true, forKey: "gameInProgress")
+    }
+    
+    
     //MARK: - Lifecycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
         setupViews()
         setConstraints()
+        checkGameStatus()
     }
+    
+    private func checkGameStatus() {
+        if UserDefaults.standard.bool(forKey: "gameInProgress") {
+            buttonNewGame.setBackgroundImage(UIImage(named: "BlueButton"), for: .normal)
+            buttonContinueGame.isHidden = false
+        }
+    }
+    
     
     private func setupViews() {
         view.backgroundColor = .systemPink
@@ -84,6 +118,7 @@ class WelcomeViewController: UIViewController {
         view.addSubview(logoImage)
         view.addSubview(labelText)
         view.addSubview(buttonNewGame)
+        view.addSubview(buttonContinueGame)
     }
     
     //MARK: - setConstraints
@@ -113,6 +148,11 @@ class WelcomeViewController: UIViewController {
             labelText.topAnchor.constraint(equalTo: logoImage.bottomAnchor, constant: 16),
             labelText.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 58),
             labelText.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -58),
+            
+            buttonContinueGame.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -32),
+            buttonContinueGame.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 32),
+            buttonContinueGame.bottomAnchor.constraint(equalTo: buttonNewGame.topAnchor, constant: -20),
+            buttonContinueGame.heightAnchor.constraint(equalTo: buttonNewGame.heightAnchor),
             
             
             buttonNewGame.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -32),
