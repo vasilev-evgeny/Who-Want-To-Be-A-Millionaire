@@ -11,7 +11,8 @@ class ResultViewController: BaseViewController {
     enum Constants {
 
     }
-    
+    private let moneyWon: String
+    private let finalAnswerCount: Int
     private let startNewGameButton = Button()
     private let goToMainScreenButton = Button()
     
@@ -36,9 +37,10 @@ class ResultViewController: BaseViewController {
     private lazy var labelWithCoinIconStack: UIStackView = {
         let iconView = UIImageView()
         iconView.image = UIImage(named: "CoinIcon")
+        iconView.contentMode = .scaleAspectFill
         iconView.translatesAutoresizingMaskIntoConstraints = false
         iconView.widthAnchor.constraint(equalToConstant: 40).isActive = true
-        iconView.heightAnchor.constraint(equalToConstant: 40).isActive = true
+//        iconView.heightAnchor.constraint(equalToConstant: 40).isActive = true
         
         let stack = UIStackView(arrangedSubviews: [iconView, coinLabel])
         stack.axis = .horizontal
@@ -54,6 +56,7 @@ class ResultViewController: BaseViewController {
         stack.axis = .vertical
         stack.spacing = 4
         stack.alignment = .center
+        stack.distribution = .fillEqually
         stack.translatesAutoresizingMaskIntoConstraints = false
         
         return stack
@@ -75,12 +78,22 @@ class ResultViewController: BaseViewController {
     
     //MARK: - Lifecycle
     
+    init(moneyWon: String, finalAnswerCount: Int) {
+        self.moneyWon = moneyWon
+        self.finalAnswerCount = finalAnswerCount
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
         titleLabel.text = "Game over!"
-        subtitleLevel.text = "Level 8"//потом можно вынести в переменные и передавать значения тут в зависимости от уровня пользователя и тд
-        coinLabel.text = "$15,000"
+        subtitleLevel.text = "Level \(finalAnswerCount)"
+        coinLabel.text = "$ " + moneyWon
         
         setupViews()
         setConstraints()
@@ -100,7 +113,9 @@ class ResultViewController: BaseViewController {
         
         goToMainScreenButton.titleText = "Main screen"
         goToMainScreenButton.applyBackground(named: "BlueButton")
-        goToMainScreenButton.onTap = { 
+        goToMainScreenButton.onTap = { [weak self] in
+            self?.navigationController?.popToRootViewController(animated: true)
+            self?.navigationController?.navigationBar.isHidden = false
             print("go to main screen")
         }
     }
@@ -120,6 +135,7 @@ class ResultViewController: BaseViewController {
         
         resultInfoStackView.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 24).isActive = true
         resultInfoStackView.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
+        
         
         buttonsStack.topAnchor.constraint(equalTo: resultInfoStackView.bottomAnchor, constant: 124).isActive = true
         buttonsStack.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true

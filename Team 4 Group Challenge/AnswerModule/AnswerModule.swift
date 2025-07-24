@@ -6,20 +6,20 @@
 //
 import UIKit
 
-class AnswerViewController: UIViewController {
+class AnswerViewController: BaseViewController {
     //MARK: - Properties
     var answers: [Answer]
     
     //MARK: - Create UI
-    private let backgroundImageView = {
-        let imageView = UIImageView()
-        imageView.contentMode = .scaleAspectFill
-        let image = UIImage(resource: .background)
-        imageView.image = image
-        
-        return imageView
-    }()
-    private let logoImageView = {
+//    private let backgroundImageView = {
+//        let imageView = UIImageView()
+//        imageView.contentMode = .scaleAspectFill
+//        let image = UIImage(resource: .background)
+//        imageView.image = image
+//        
+//        return imageView
+//    }()
+    private let gameLogoImageView = {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFit
         let image = UIImage(resource: .gameLogo)
@@ -38,6 +38,17 @@ class AnswerViewController: UIViewController {
         button.addAction(UIAction(handler: { [weak self] _ in
             self?.getMoneyButtonPressed()
         }), for: .touchUpInside)
+        button.translatesAutoresizingMaskIntoConstraints = false
+        
+        return button
+    }()
+    private lazy var continueButton = {
+        let button = Button()
+        button.titleText = "Continue"
+        button.applyBackground(named: "BlueButton")
+        button.onTap = { [weak self] in
+            self?.continueButtonPressed()
+        }
         button.translatesAutoresizingMaskIntoConstraints = false
         
         return button
@@ -70,31 +81,21 @@ class AnswerViewController: UIViewController {
         setupViews()
         setConstraints()
     }
+   
     //MARK: - Methods
     private func getMoneyButtonPressed() {
-    //TODO: - Make open score view and finish game
-        ///This function just for checking the action
-        print(#function)
-        for i in 0..<answers.count {
-            if answers[i].isCurrent {
-                answers[i].isCurrent = false
-                if i > 0 {
-                    answers[i-1].isCurrent = true
-                } else {
-                    answers[14].isCurrent = true
-                    break
-                }
-            }
-        }
-        tableView.reloadData()
+        let currentQuestion = GameBrain.shared.currentQuestion
+        let money = answers[currentQuestion].questionPrice
+        
+        navigationController?.pushViewController(ResultViewController(moneyWon: money , finalAnswerCount: currentQuestion), animated: true)
+    }
+    private func continueButtonPressed() {
+        navigationController?.popViewController(animated: true)
+        navigationController?.navigationBar.isHidden = false
     }
     //MARK: - setLayout
     private func setupViews() {
-        setBackground()
-    }
-    private func setBackground() {
-        view.addSubview(backgroundImageView)
-        backgroundImageView.frame = view.bounds
+        navigationController?.navigationBar.isHidden = true
     }
     
     //MARK: - setConstraints
@@ -102,6 +103,7 @@ class AnswerViewController: UIViewController {
         view.addSubview(getMoneyButton)
         view.addSubview(tableView)
         view.addSubview(logoImageView)
+        view.addSubview(continueButton)
         
         NSLayoutConstraint.activate([
             logoImageView.topAnchor.constraint(equalTo: view.topAnchor, constant: 76),
@@ -117,7 +119,12 @@ class AnswerViewController: UIViewController {
             tableView.topAnchor.constraint(equalTo: view.topAnchor, constant: 146),
             tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
             tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
-            tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+            tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            
+            continueButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            continueButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -10),
+            continueButton.widthAnchor.constraint(equalToConstant: view.frame.width / 2.6),
+            continueButton.heightAnchor.constraint(equalToConstant: 36)
         ])
     }
 }
@@ -136,7 +143,3 @@ extension AnswerViewController: UITableViewDelegate, UITableViewDataSource {
         return cell
     }
 }
-
-//#Preview {
-//    AnswerViewController(answers: Answer.getAnswerList())
-//}

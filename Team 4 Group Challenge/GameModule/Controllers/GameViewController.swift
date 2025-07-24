@@ -59,10 +59,13 @@ class GameViewController: UIViewController {
         return bottomTitleLabel
     }()
     
-    let chartButton : UIButton = {
+    private lazy var chartButton : UIButton = {
         let chartButton = UIButton()
         chartButton.backgroundColor = .clear
         chartButton.setImage(UIImage(named: "barChart"), for: .normal)
+        chartButton.addAction(UIAction(handler: { [weak self] _ in
+            self?.chartButtonPressed()
+        }), for: .touchUpInside)
         chartButton.translatesAutoresizingMaskIntoConstraints = false
         return chartButton
     }()
@@ -171,130 +174,138 @@ class GameViewController: UIViewController {
             navigationController?.setNavigationBarHidden(false, animated: true)
         }
     }
+    
+    //MARK: - Methods
+    
+    private func chartButtonPressed() {
+        let vc = AnswerViewController(answers: Answer.getAnswerList())
         
-        //MARK: - Setup UI
-        
-        func setupUI() {
-            
-            view.addSubview(mainView)
-            NSLayoutConstraint.activate([
-                mainView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-                mainView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-                mainView.topAnchor.constraint(equalTo: view.topAnchor),
-                mainView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
-            ])
-            
-            //MARK: - NavigationBar UI
-            
-            backButtonContainter.addSubview(backButton)
-            NSLayoutConstraint.activate([
-                backButtonContainter.heightAnchor.constraint(equalToConstant: 44),
-                backButtonContainter.widthAnchor.constraint(equalToConstant: 32),
-                
-                backButton.topAnchor.constraint(equalTo: backButtonContainter.topAnchor),
-                backButton.centerXAnchor.constraint(equalTo: backButtonContainter.centerXAnchor),
-            ])
-            navigationItem.leftBarButtonItem = UIBarButtonItem(customView: backButtonContainter)
-            
-            chartButtonContainter.addSubview(chartButton)
-            NSLayoutConstraint.activate([
-                chartButtonContainter.heightAnchor.constraint(equalToConstant: 44),
-                chartButtonContainter.widthAnchor.constraint(equalToConstant: 32),
-                
-                chartButton.topAnchor.constraint(equalTo: chartButtonContainter.topAnchor),
-                chartButton.centerXAnchor.constraint(equalTo: chartButtonContainter.centerXAnchor),
-            ])
-            navigationItem.rightBarButtonItem = UIBarButtonItem(customView: chartButtonContainter)
-            
-            labelStack.addArrangedSubview(topTitleLabel)
-            labelStack.addArrangedSubview(bottomTitleLabel)
-            
-            navigationItem.titleView = labelStack
-            bottomTitleLabel.attributedText = attributedText(text: "$", fontSize: 19, color: .white)
-            
-            //MARK: - Timer UI
-            
-            mainView.addSubview(timerView)
-            NSLayoutConstraint.activate([
-                timerView.centerXAnchor.constraint(equalTo: mainView.centerXAnchor),
-                timerView.centerYAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 54.5),
-                timerView.heightAnchor.constraint(equalToConstant: 45),
-                timerView.widthAnchor.constraint(equalToConstant: 91)
-            ])
-            
-            timerView.addSubview(timerImage)
-            NSLayoutConstraint.activate([
-                timerImage.topAnchor.constraint(equalTo: timerView.topAnchor, constant: 10.5),
-                timerImage.leadingAnchor.constraint(equalTo: timerView.leadingAnchor, constant: 17),
-                timerImage.widthAnchor.constraint(equalToConstant: 24),
-                timerImage.heightAnchor.constraint(equalToConstant: 24)
-            ])
-            
-            timerView.addSubview(timerCounter)
-            NSLayoutConstraint.activate([
-                timerCounter.topAnchor.constraint(equalTo: timerView.topAnchor, constant: 8),
-                timerCounter.leadingAnchor.constraint(equalTo: timerImage.trailingAnchor, constant: 8),
-                timerCounter.widthAnchor.constraint(equalToConstant: 27),
-                timerCounter.heightAnchor.constraint(equalToConstant: 29)
-            ])
-            timerCounter.attributedText = attributedText(text: "60", fontSize: 22, color: .white)
-            
-            //MARK: - Question Section UI
-            mainView.addSubview(questionTextView)
-            NSLayoutConstraint.activate([
-                questionTextView.topAnchor.constraint(equalTo: timerView.bottomAnchor, constant: 24),
-                questionTextView.leadingAnchor.constraint(equalTo: mainView.leadingAnchor, constant: 32),
-                questionTextView.trailingAnchor.constraint(equalTo: mainView.trailingAnchor, constant: -32),
-                questionTextView.heightAnchor.constraint(equalToConstant: 147)
-            ])
-            questionTextView.attributedText = attributedText(text: "What year was the year, when first deodorant was invented in our life?", fontSize: 24, color: .white)
-            
-            //MARK: - Answers Section UI
-            mainView.addSubview(answersStack)
-            NSLayoutConstraint.activate([
-                answersStack.topAnchor.constraint(equalTo: questionTextView.bottomAnchor, constant: 32),
-                answersStack.leadingAnchor.constraint(equalTo: mainView.leadingAnchor, constant: 32),
-                answersStack.trailingAnchor.constraint(equalTo: mainView.trailingAnchor, constant: -32),
-                answersStack.heightAnchor.constraint(equalToConstant: 272)
-            ])
-            let sortedAnswerButtonsTitles = answerButtonsTitles.sorted { $0.key < $1.key }
-            for (key, value) in sortedAnswerButtonsTitles {
-                answersButtonArray.append(createAnswerButton(letter: key, title: value))
-            }
-            answersButtonArray.forEach { answersStack.addArrangedSubview($0)
-            }
-            
-            //MARK: - Hints UI
-            mainView.addSubview(hintsStack)
-            NSLayoutConstraint.activate([
-                hintsStack.topAnchor.constraint(equalTo: answersStack.bottomAnchor, constant: 40),
-                hintsStack.centerXAnchor.constraint(equalTo: answersStack.centerXAnchor),
-                hintsStack.heightAnchor.constraint(equalToConstant: 64),
-                //            hintsStack.leadingAnchor.constraint(equalTo: mainView.leadingAnchor, constant: 32),
-                //            hintsStack.trailingAnchor.constraint(equalTo: mainView.trailingAnchor, constant: -32)
-            ])
-            hintButtonsImages.forEach {
-                hintButtons.append(createHintButton(image: $0))
-            }
-            hintButtons.forEach {
-                hintsStack.addArrangedSubview($0)
-                //            $0.widthAnchor.constraint(equalToConstant: 84).isActive = true
-                //            $0.heightAnchor.constraint(equalToConstant: 64).isActive = true
-            }
-            
-        }
-        //MARK: func attributedText
-        func attributedText(text: String, fontSize: CGFloat, color: UIColor, firstLineIntend: CGFloat = 0) -> NSAttributedString {
-            let paragraphStyle = NSMutableParagraphStyle()
-            paragraphStyle.firstLineHeadIndent = firstLineIntend
-            paragraphStyle.alignment = .center
-            let attributes : [NSAttributedString.Key: Any] = [
-                .font: UIFont.systemFont(ofSize: fontSize, weight: .semibold),
-                .foregroundColor: color,
-                .paragraphStyle: paragraphStyle
-            ]
-            return NSAttributedString(string: text, attributes: attributes)
-            
-        }
+        navigationController?.pushViewController(vc, animated: true)
     }
+    
+    //MARK: - Setup UI
+    
+    func setupUI() {
+        
+        view.addSubview(mainView)
+        NSLayoutConstraint.activate([
+            mainView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            mainView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            mainView.topAnchor.constraint(equalTo: view.topAnchor),
+            mainView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+        ])
+        
+        //MARK: - NavigationBar UI
+        
+        backButtonContainter.addSubview(backButton)
+        NSLayoutConstraint.activate([
+            backButtonContainter.heightAnchor.constraint(equalToConstant: 44),
+            backButtonContainter.widthAnchor.constraint(equalToConstant: 32),
+            
+            backButton.topAnchor.constraint(equalTo: backButtonContainter.topAnchor),
+            backButton.centerXAnchor.constraint(equalTo: backButtonContainter.centerXAnchor),
+        ])
+        navigationItem.leftBarButtonItem = UIBarButtonItem(customView: backButtonContainter)
+        
+        chartButtonContainter.addSubview(chartButton)
+        NSLayoutConstraint.activate([
+            chartButtonContainter.heightAnchor.constraint(equalToConstant: 44),
+            chartButtonContainter.widthAnchor.constraint(equalToConstant: 32),
+            
+            chartButton.topAnchor.constraint(equalTo: chartButtonContainter.topAnchor),
+            chartButton.centerXAnchor.constraint(equalTo: chartButtonContainter.centerXAnchor),
+        ])
+        navigationItem.rightBarButtonItem = UIBarButtonItem(customView: chartButtonContainter)
+        
+        labelStack.addArrangedSubview(topTitleLabel)
+        labelStack.addArrangedSubview(bottomTitleLabel)
+        
+        navigationItem.titleView = labelStack
+        bottomTitleLabel.attributedText = attributedText(text: "$", fontSize: 19, color: .white)
+        
+        //MARK: - Timer UI
+        
+        mainView.addSubview(timerView)
+        NSLayoutConstraint.activate([
+            timerView.centerXAnchor.constraint(equalTo: mainView.centerXAnchor),
+            timerView.centerYAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 54.5),
+            timerView.heightAnchor.constraint(equalToConstant: 45),
+            timerView.widthAnchor.constraint(equalToConstant: 91)
+        ])
+        
+        timerView.addSubview(timerImage)
+        NSLayoutConstraint.activate([
+            timerImage.topAnchor.constraint(equalTo: timerView.topAnchor, constant: 10.5),
+            timerImage.leadingAnchor.constraint(equalTo: timerView.leadingAnchor, constant: 17),
+            timerImage.widthAnchor.constraint(equalToConstant: 24),
+            timerImage.heightAnchor.constraint(equalToConstant: 24)
+        ])
+        
+        timerView.addSubview(timerCounter)
+        NSLayoutConstraint.activate([
+            timerCounter.topAnchor.constraint(equalTo: timerView.topAnchor, constant: 8),
+            timerCounter.leadingAnchor.constraint(equalTo: timerImage.trailingAnchor, constant: 8),
+            timerCounter.widthAnchor.constraint(equalToConstant: 27),
+            timerCounter.heightAnchor.constraint(equalToConstant: 29)
+        ])
+        timerCounter.attributedText = attributedText(text: "60", fontSize: 22, color: .white)
+        
+        //MARK: - Question Section UI
+        mainView.addSubview(questionTextView)
+        NSLayoutConstraint.activate([
+            questionTextView.topAnchor.constraint(equalTo: timerView.bottomAnchor, constant: 24),
+            questionTextView.leadingAnchor.constraint(equalTo: mainView.leadingAnchor, constant: 32),
+            questionTextView.trailingAnchor.constraint(equalTo: mainView.trailingAnchor, constant: -32),
+            questionTextView.heightAnchor.constraint(equalToConstant: 147)
+        ])
+        questionTextView.attributedText = attributedText(text: "What year was the year, when first deodorant was invented in our life?", fontSize: 24, color: .white)
+        
+        //MARK: - Answers Section UI
+        mainView.addSubview(answersStack)
+        NSLayoutConstraint.activate([
+            answersStack.topAnchor.constraint(equalTo: questionTextView.bottomAnchor, constant: 32),
+            answersStack.leadingAnchor.constraint(equalTo: mainView.leadingAnchor, constant: 32),
+            answersStack.trailingAnchor.constraint(equalTo: mainView.trailingAnchor, constant: -32),
+            answersStack.heightAnchor.constraint(equalToConstant: 272)
+        ])
+        let sortedAnswerButtonsTitles = answerButtonsTitles.sorted { $0.key < $1.key }
+        for (key, value) in sortedAnswerButtonsTitles {
+            answersButtonArray.append(createAnswerButton(letter: key, title: value))
+        }
+        answersButtonArray.forEach { answersStack.addArrangedSubview($0)
+        }
+        
+        //MARK: - Hints UI
+        mainView.addSubview(hintsStack)
+        NSLayoutConstraint.activate([
+            hintsStack.topAnchor.constraint(equalTo: answersStack.bottomAnchor, constant: 40),
+            hintsStack.centerXAnchor.constraint(equalTo: answersStack.centerXAnchor),
+            hintsStack.heightAnchor.constraint(equalToConstant: 64),
+            //            hintsStack.leadingAnchor.constraint(equalTo: mainView.leadingAnchor, constant: 32),
+            //            hintsStack.trailingAnchor.constraint(equalTo: mainView.trailingAnchor, constant: -32)
+        ])
+        hintButtonsImages.forEach {
+            hintButtons.append(createHintButton(image: $0))
+        }
+        hintButtons.forEach {
+            hintsStack.addArrangedSubview($0)
+            //            $0.widthAnchor.constraint(equalToConstant: 84).isActive = true
+            //            $0.heightAnchor.constraint(equalToConstant: 64).isActive = true
+        }
+        
+    }
+    //MARK: func attributedText
+    func attributedText(text: String, fontSize: CGFloat, color: UIColor, firstLineIntend: CGFloat = 0) -> NSAttributedString {
+        let paragraphStyle = NSMutableParagraphStyle()
+        paragraphStyle.firstLineHeadIndent = firstLineIntend
+        paragraphStyle.alignment = .center
+        let attributes : [NSAttributedString.Key: Any] = [
+            .font: UIFont.systemFont(ofSize: fontSize, weight: .semibold),
+            .foregroundColor: color,
+            .paragraphStyle: paragraphStyle
+        ]
+        return NSAttributedString(string: text, attributes: attributes)
+        
+    }
+}
 
