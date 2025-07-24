@@ -16,7 +16,7 @@ class RulesViewController: UIViewController {
         
         The goal of the game is to reach the sum of one million dollars.
         To achieve this goal, the player must correctly answer 15 questions.
-        questions from various fields of knowledge. The time for reflection is limited to 24 seconds. The difficulty of the game increases with each new question.
+        questions from various fields of knowledge. The time for reflection is limited to 30 seconds. The difficulty of the game increases with each new question.
 
         The questions have four possible answers, of which only one is correct. 
         Each question has a specific cost that cannot be combined with 

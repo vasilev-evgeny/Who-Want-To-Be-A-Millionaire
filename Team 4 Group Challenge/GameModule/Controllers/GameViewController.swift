@@ -7,6 +7,10 @@
 import UIKit
 
 class GameViewController: UIViewController {
+    var countdownTimer: CountdownTimer? = CountdownTimer()
+    enum Constants {
+    }
+
     
     let game = GameBrain.shared
     
@@ -83,8 +87,17 @@ class GameViewController: UIViewController {
     }()
     
     let timerImage : UIImageView = {
-        let timerImage = UIImageView(image: UIImage(named: "stopwatch"))
+        let timerImage = UIImageView()
         timerImage.translatesAutoresizingMaskIntoConstraints = false
+        timerImage.image?.withRenderingMode(.alwaysTemplate)
+        
+        // Делаем timerImage tintable
+        if let image = UIImage(named: "stopwatch") {
+            let tintedTimerImage = image.withRenderingMode(.alwaysTemplate)
+            timerImage.image = tintedTimerImage
+            timerImage.tintColor = .white
+        }
+        
         return timerImage
     }()
     
@@ -168,6 +181,8 @@ class GameViewController: UIViewController {
             return gameOver()
         }
         setupUI()
+        setupViews()
+        countdownTimer?.startTimer(viewController: self)
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -244,7 +259,8 @@ class GameViewController: UIViewController {
                 timerCounter.widthAnchor.constraint(equalToConstant: 27),
                 timerCounter.heightAnchor.constraint(equalToConstant: 29)
             ])
-            timerCounter.attributedText = attributedText(text: "32", fontSize: 22, color: .white)
+            timerCounter.attributedText = attributedText(text: "30", fontSize: 22, color: .white)
+
             
             //MARK: - Question Section UI
             mainView.addSubview(questionTextView)
@@ -286,9 +302,11 @@ class GameViewController: UIViewController {
             hintButtons.forEach {
                 hintsStack.addArrangedSubview($0)
             }
-            
         }
     
+
+        //MARK: func attributedText
+
     
     
         func attributedText(text: String, fontSize: CGFloat, color: UIColor, firstLineIntend: CGFloat = 0) -> NSAttributedString {
