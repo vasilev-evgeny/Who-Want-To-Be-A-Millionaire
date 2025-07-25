@@ -71,6 +71,42 @@ class WelcomeViewController: UIViewController {
         return $0
     }(UILabel())
     
+    let allTimeLabel : UILabel = {
+        let label = UILabel()
+        label.text = "All time Best Score"
+        label.font = UIFont.systemFont(ofSize: 16, weight: .regular)
+        label.textColor = UIColor(red: 145/255, green: 159/255, blue: 181/255, alpha: 1)
+        label.textAlignment = .center
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+    
+    let coinIcon : UIImageView = {
+        let view = UIImageView()
+        view.image = UIImage(named: "CoinIcon")
+        view.contentMode = .scaleAspectFill
+        return view
+    }()
+    
+    let allTimeCashLabel : UILabel = {
+        let label = UILabel()
+        label.text = "$\(GameBrain.shared.allTimeRecord)"
+        label.font = UIFont.systemFont(ofSize: 24, weight: .semibold)
+        label.textColor = UIColor.white
+        label.textAlignment = .center
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+    
+    let recordStaskView : UIStackView = {
+        let view = UIStackView()
+        view.axis = .horizontal
+        view.spacing = 1
+        view.distribution = .fillProportionally
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
+    }()
+    
     
     //MARK: - Action Func
     
@@ -127,6 +163,10 @@ class WelcomeViewController: UIViewController {
         view.addSubview(labelText)
         view.addSubview(buttonNewGame)
         view.addSubview(buttonContinueGame)
+        view.addSubview(recordStaskView)
+        view.addSubview(allTimeLabel)
+        recordStaskView.addArrangedSubview(coinIcon)
+        recordStaskView.addArrangedSubview(allTimeCashLabel)
     }
     
     //MARK: - setConstraints
@@ -159,13 +199,21 @@ class WelcomeViewController: UIViewController {
             
             buttonNewGame.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -32),
             buttonNewGame.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 32),
-            buttonNewGame.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -109),
+            buttonNewGame.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -100),
             
             buttonContinueGame.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -32),
             buttonContinueGame.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 32),
             buttonContinueGame.bottomAnchor.constraint(equalTo: buttonNewGame.topAnchor, constant: -20),
             buttonContinueGame.heightAnchor.constraint(equalTo: buttonNewGame.heightAnchor),
             
+            allTimeLabel.topAnchor.constraint(equalTo: labelText.bottomAnchor,constant: 16),
+            allTimeLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            
+            recordStaskView.topAnchor.constraint(equalTo: allTimeLabel.bottomAnchor,constant: 10),
+            recordStaskView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            recordStaskView.leadingAnchor.constraint(equalTo: view.leadingAnchor,constant: 124),
+            recordStaskView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -124),
+            recordStaskView.heightAnchor.constraint(equalToConstant: 32)
         ])
         
     }

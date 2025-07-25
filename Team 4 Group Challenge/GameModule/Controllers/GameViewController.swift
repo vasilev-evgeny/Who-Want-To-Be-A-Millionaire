@@ -181,6 +181,7 @@ class GameViewController: UIViewController {
         }
         setupUI()
         CountdownTimer.shared.startTimer(viewController: self)
+        SoundManager.shared.play(.background)
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -323,6 +324,7 @@ class GameViewController: UIViewController {
     
     @objc func pushBackButton(sender: UIButton) {
         sender.buttonTappedAnimate()
+        SoundManager.shared.stopMusic()
         let targetVC = WelcomeViewController()
         self.navigationController?.pushViewController(targetVC, animated: true)
         targetVC.navigationItem.hidesBackButton = true
@@ -340,6 +342,7 @@ class GameViewController: UIViewController {
     
     @objc func answerButtonPressed(_ sender: Button) {
         sender.buttonTappedAnimate()
+        SoundManager.shared.play(.suspense)
         CountdownTimer.shared.stopTimer()
         sender.setBackgroundImage(UIImage(named: "YellowButton"), for: .normal)
         guard let title = sender.currentAttributedTitle?.string else { return }
@@ -349,6 +352,7 @@ class GameViewController: UIViewController {
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
             if isCorrectAnswer {
+                SoundManager.shared.play(.correct)
                 sender.setBackgroundImage(UIImage(named: "right_answer"), for: .normal)
                 sender.blink()
                 DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
@@ -370,6 +374,7 @@ class GameViewController: UIViewController {
                 
             }
             else {
+                SoundManager.shared.play(.wrong)
                 sender.setBackgroundImage(UIImage(named: "wrong_answer"), for: .normal)
                 DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
                     self.gameOver()
@@ -386,6 +391,7 @@ class GameViewController: UIViewController {
         DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
             self.navigationController?.popViewController(animated: true)
             CountdownTimer.shared.startTimer(viewController: self)
+            SoundManager.shared.play(.background)
         }
         
     }

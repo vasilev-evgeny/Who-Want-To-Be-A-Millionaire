@@ -18,11 +18,15 @@ final class SoundManager {
         case background = "background_music"
         case correct = "correct_answer"
         case wrong = "wrong_answer"
-        case suspense = "suspense_music"
+        case suspense = "suspence_music"
     }
     
     func play(_ soundType: SoundType) {
         playSound(soundType.rawValue)
+    }
+    
+    func stopMusic() {
+        player?.stop()
     }
     
     private func playSound(_ soundName: String) {

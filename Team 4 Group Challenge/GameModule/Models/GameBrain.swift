@@ -165,4 +165,6 @@ final class GameBrain {
 //        }
 //    }
     var isGameInProgress : Bool = false
+    
+    var allTimeRecord : Int = 0
 }
