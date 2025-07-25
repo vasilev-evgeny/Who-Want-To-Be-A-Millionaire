@@ -7,11 +7,12 @@
 
 import UIKit
 
-class CountdownTimer {
+final class CountdownTimer {
     
     var secondsRemaining = 30
     var timer: Timer? = Timer()
     var gameVC: GameViewController?
+    static let shared = CountdownTimer()
     
 
     func startTimer(viewController: GameViewController) {

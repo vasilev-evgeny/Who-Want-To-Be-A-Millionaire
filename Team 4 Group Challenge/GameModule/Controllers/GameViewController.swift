@@ -7,7 +7,6 @@
 import UIKit
 
 class GameViewController: UIViewController {
-    var countdownTimer: CountdownTimer? = CountdownTimer()
     enum Constants {
     }
 
@@ -181,8 +180,7 @@ class GameViewController: UIViewController {
             return gameOver()
         }
         setupUI()
-        setupViews()
-        countdownTimer?.startTimer(viewController: self)
+        CountdownTimer.shared.startTimer(viewController: self)
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -321,13 +319,17 @@ class GameViewController: UIViewController {
             return NSAttributedString(string: text, attributes: attributes)
         }
     
-    @objc func pushBackButton() {
+    //MARK: - Action Func
+    
+    @objc func pushBackButton(sender: UIButton) {
+        sender.buttonTappedAnimate()
         let targetVC = WelcomeViewController()
         self.navigationController?.pushViewController(targetVC, animated: true)
         targetVC.navigationItem.hidesBackButton = true
     }
     
-    @objc func pushChartButton() {
+    @objc func pushChartButton(sender: UIButton) {
+        sender.buttonTappedAnimate()
         let targetVC = AnswerModule(answers: Answer.getAnswerList())
         self.navigationController?.pushViewController(targetVC, animated: true)
         targetVC.navigationItem.hidesBackButton = true
@@ -337,6 +339,8 @@ class GameViewController: UIViewController {
     }
     
     @objc func answerButtonPressed(_ sender: Button) {
+        sender.buttonTappedAnimate()
+        CountdownTimer.shared.stopTimer()
         sender.setBackgroundImage(UIImage(named: "YellowButton"), for: .normal)
         guard let title = sender.currentAttributedTitle?.string else { return }
         
@@ -381,6 +385,7 @@ class GameViewController: UIViewController {
         targetVC.navigationItem.hidesBackButton = true
         DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
             self.navigationController?.popViewController(animated: true)
+            CountdownTimer.shared.startTimer(viewController: self)
         }
         
     }
@@ -398,6 +403,8 @@ class GameViewController: UIViewController {
         }
     }
 }
+
+//MARK: - Extension UIView
 
 extension UIView {
     func blink(duration: TimeInterval = 0.5, delay: TimeInterval = 0.0, alpha: CGFloat = 0.0) {
