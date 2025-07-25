@@ -401,6 +401,7 @@ class GameViewController: UIViewController {
     
     func gameOver() {
         let targetVC = ResultViewController()
+        GameBrain.shared.isGameInProgress = false
         self.navigationController?.pushViewController(targetVC, animated: true)
         targetVC.navigationItem.hidesBackButton = true
     }

@@ -100,14 +100,20 @@ class ResultViewController: BaseViewController, QuestionManagerDelegate {
         startNewGameButton.titleText = "New game"
         startNewGameButton.applyBackground(named: "YellowButton")
         startNewGameButton.onTap = {
-            print("Start new game")
-            
+            self.startNewGameButton.buttonTappedAnimate()
+            GameBrain.shared.isGameInProgress = true
+            GameBrain.shared.refreshGame()
+            let gameVC = GameViewController()
+            self.navigationController?.pushViewController(gameVC, animated: true)
         }
         
         goToMainScreenButton.titleText = "Main screen"
         goToMainScreenButton.applyBackground(named: "BlueButton")
         goToMainScreenButton.onTap = { 
-            print("go to main screen")
+            self.goToMainScreenButton.buttonTappedAnimate()
+            GameBrain.shared.isGameInProgress = false
+            let vc = WelcomeViewController()
+            self.navigationController?.pushViewController(vc, animated: true)
         }
     }
     

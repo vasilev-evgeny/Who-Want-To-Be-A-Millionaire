@@ -128,7 +128,6 @@ class WelcomeViewController: UIViewController {
     @objc func newGameButtonTapped(sender : UIButton) {
         sender.buttonTappedAnimate()
         GameBrain.shared.isGameInProgress = true
-        print(GameBrain.shared.isGameInProgress)
         GameBrain.shared.refreshGame()
         let gameVC = GameViewController()
         self.navigationController?.pushViewController(gameVC, animated: true)
