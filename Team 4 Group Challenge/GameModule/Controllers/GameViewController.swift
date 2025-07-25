@@ -230,7 +230,7 @@ class GameViewController: UIViewController {
         
         navigationItem.titleView = labelStack
         topTitleLabel.attributedText = attributedText(text: "QUESTION #\(game.currentQuestion + 1)", fontSize: 18, color: .white)
-        bottomTitleLabel.attributedText = attributedText(text: "$\(game.currentPrize)", fontSize: 19, color: .white)
+        bottomTitleLabel.attributedText = attributedText(text: "$\(game.questionsWorth[game.currentQuestion])", fontSize: 19, color: .white)
         
         //MARK: - Timer UI
         
@@ -346,7 +346,7 @@ class GameViewController: UIViewController {
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
             if isCorrectAnswer {
-                if self.game.currentPrize > self.game.allTimeRecord {
+                if self.game.currentPrize > UserDefaults.standard.integer(forKey: "allTimeRecord") {
                     self.game.allTimeRecord = self.game.currentPrize
                     UserDefaults.standard.set(self.game.allTimeRecord, forKey: "allTimeRecord")
                 }

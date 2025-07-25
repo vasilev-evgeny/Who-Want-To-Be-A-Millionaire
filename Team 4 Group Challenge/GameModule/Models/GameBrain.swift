@@ -94,7 +94,7 @@ final class GameBrain {
         )
     ]
     
-    private let questionsWorth = [
+     let questionsWorth = [
         500,
         1000,
         2000,
@@ -127,7 +127,7 @@ final class GameBrain {
     var isGameOver = false //переменная чтобы чекать, закончилась ли игра
     
     var currentPrize: Int {
-        return questionsWorth[currentQuestion]
+        return currentQuestion > 0 ? answers[15 - currentQuestion].questionPrice : 0
     }  //переменная для текущего выигрыша
     
     var guaranteedPrize: Int = 0 //переменная для несгораемой суммы
