@@ -36,14 +36,14 @@ final class CountdownTimer {
         gameVC?.timerCounter.text = String(secondsRemaining)
         gameVC?.timerCounter.pulse()
 
-        if secondsRemaining == 10 {
+        if secondsRemaining == 15 {
             
             gameVC?.timerView.layer.backgroundColor = UIColor.warningTimerView?.cgColor
             gameVC?.timerImage.tintColor = UIColor.warningTimer
             gameVC?.timerCounter.textColor = UIColor.warningTimerCounter
             gameVC?.timerCounter.pulse()
 
-        } else if secondsRemaining == 3 {
+        } else if secondsRemaining == 5 {
             
             gameVC?.timerView.layer.backgroundColor = UIColor.alertTimerView?.cgColor
             gameVC?.timerImage.tintColor = UIColor.alertTimer

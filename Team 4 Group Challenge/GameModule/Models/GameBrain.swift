@@ -95,21 +95,21 @@ final class GameBrain {
     ]
     
     private let questionsWorth = [
-        "500",
-        "1,000",
-        "2,000",
-        "3,000",
-        "5,000",
-        "7,500",
-        "10,000",
-        "12,000",
-        "15,000",
-        "25,000",
-        "50,000",
-        "100,000",
-        "250,000",
-        "500,000",
-        "1,000,000"
+        500,
+        1000,
+        2000,
+        3000,
+        5000,
+        7500,
+        10000,
+        12000,
+        15000,
+        25000,
+        50000,
+        100000,
+        250000,
+        500000,
+        1000000
     ]
     
     private var newGameQuestion : [Question] {
@@ -126,11 +126,11 @@ final class GameBrain {
     
     var isGameOver = false //переменная чтобы чекать, закончилась ли игра
     
-    var currentPrize: String {
+    var currentPrize: Int {
         return questionsWorth[currentQuestion]
     }  //переменная для текущего выигрыша
     
-    var guaranteedPrize: String = "0" //переменная для несгораемой суммы
+    var guaranteedPrize: Int = 0 //переменная для несгораемой суммы
     
     var isWalkAwayAvailable: Bool = true //переменная проверить, можно ли забрать деньги досрочно
     
@@ -149,7 +149,7 @@ final class GameBrain {
         self.medium = medium.shuffled()
         self.hard = hard.shuffled()
         currentQuestion = 0
-        guaranteedPrize = "0"
+        guaranteedPrize = 0
         helpButtonIsEnabled = true
         audienceButtonIsEnabled = true
         mistakeButtonIsEnabled = true
@@ -166,5 +166,5 @@ final class GameBrain {
 //    }
     var isGameInProgress : Bool = false
     
-    var allTimeRecord : String = "0"
+    var allTimeRecord : Int = 0
 }

@@ -9,7 +9,6 @@ import UIKit
 class GameViewController: UIViewController {
     enum Constants {
     }
-
     
     let game = GameBrain.shared
     
@@ -322,13 +321,6 @@ class GameViewController: UIViewController {
     
     //MARK: - Action Func
     
-    func upgradeRecord() {
-        print("олл тайм рекорд \(game.allTimeRecord)")
-        UserDefaults.standard.set("\(self.game.allTimeRecord)", forKey: "allTimeRecord")
-        print("юзер дифолт вот такой сейчас по идее \(UserDefaults.standard.string(forKey: "allTimeRecord"))")
-        UserDefaults.standard.synchronize()
-    }
-    
     @objc func pushBackButton(sender: UIButton) {
         sender.buttonTappedAnimate()
         SoundManager.shared.stopMusic()
@@ -359,6 +351,10 @@ class GameViewController: UIViewController {
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
             if isCorrectAnswer {
+                if self.game.currentPrize > self.game.allTimeRecord {
+                    self.game.allTimeRecord = self.game.currentPrize
+                    UserDefaults.standard.set(self.game.allTimeRecord, forKey: "allTimeRecord")
+                }
                 SoundManager.shared.play(.correct)
                 sender.setBackgroundImage(UIImage(named: "right_answer"), for: .normal)
                 sender.blink()
@@ -375,10 +371,7 @@ class GameViewController: UIViewController {
                         self.answersButtonArray = []
                         self.hintButtons = []
                         self.setupUI()
-                        if self.game.currentPrize > self.game.allTimeRecord {
-                            self.game.allTimeRecord = self.game.currentPrize
-                            self.upgradeRecord()
-                        }
+                        
                     }
                 }
                 
