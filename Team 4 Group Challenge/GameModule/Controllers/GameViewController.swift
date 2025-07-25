@@ -355,6 +355,9 @@ class GameViewController: UIViewController {
                 SoundManager.shared.play(.correct)
                 sender.setBackgroundImage(UIImage(named: "right_answer"), for: .normal)
                 sender.blink()
+                if self.game.currentPrize > self.game.allTimeRecord {
+                    self.game.allTimeRecord = self.game.currentPrize
+                }
                 DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
                     self.game.guaranteedPrize =  (self.game.currentQuestion + 1) % 5 == 0 ? self.game.currentPrize : self.game.guaranteedPrize
                     self.awakeAnswerModule()

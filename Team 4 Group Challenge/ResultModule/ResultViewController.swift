@@ -79,8 +79,8 @@ class ResultViewController: BaseViewController {
         super.viewDidLoad()
         
         titleLabel.text = "Game over!"
-        subtitleLevel.text = "Level 8"//потом можно вынести в переменные и передавать значения тут в зависимости от уровня пользователя и тд
-        coinLabel.text = "$15,000"
+        subtitleLevel.text = "Level \(GameBrain.shared.currentQuestion)"//потом можно вынести в переменные и передавать значения тут в зависимости от уровня пользователя и тд
+        coinLabel.text = "$\(GameBrain.shared.currentPrize)"
         
         setupViews()
         setConstraints()
