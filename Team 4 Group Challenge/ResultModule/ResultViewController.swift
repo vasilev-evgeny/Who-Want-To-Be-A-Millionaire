@@ -7,11 +7,13 @@
 import UIKit
 
 class ResultViewController: BaseViewController, QuestionManagerDelegate {
-
+    
     enum Constants {
 
     }
-    
+    /// константы для показа результата
+    private let moneyWon: String
+    private let finalAnswerCount: Int
     private let startNewGameButton = Button()
     private let goToMainScreenButton = Button()
     
@@ -36,9 +38,11 @@ class ResultViewController: BaseViewController, QuestionManagerDelegate {
     private lazy var labelWithCoinIconStack: UIStackView = {
         let iconView = UIImageView()
         iconView.image = UIImage(named: "CoinIcon")
+    /// растягивает картинку под размер
+        iconView.contentMode = .scaleAspectFill
         iconView.translatesAutoresizingMaskIntoConstraints = false
         iconView.widthAnchor.constraint(equalToConstant: 40).isActive = true
-        iconView.heightAnchor.constraint(equalToConstant: 40).isActive = true
+//        iconView.heightAnchor.constraint(equalToConstant: 40).isActive = true
         
         let stack = UIStackView(arrangedSubviews: [iconView, coinLabel])
         stack.axis = .horizontal
@@ -54,6 +58,8 @@ class ResultViewController: BaseViewController, QuestionManagerDelegate {
         stack.axis = .vertical
         stack.spacing = 4
         stack.alignment = .center
+        /// поправил отображение лейбла
+        stack.distribution = .fillEqually
         stack.translatesAutoresizingMaskIntoConstraints = false
         
         return stack
@@ -74,13 +80,21 @@ class ResultViewController: BaseViewController, QuestionManagerDelegate {
     }()
     
     //MARK: - Lifecycle
-    
+    ///инициализация для констант денег и вопросов
+    init(moneyWon: String, finalAnswerCount: Int) {
+        self.moneyWon = moneyWon
+        self.finalAnswerCount = finalAnswerCount
+        super.init(nibName: nil, bundle: nil)
+    }
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+        /// выводит результат игры
         titleLabel.text = "Game over!"
-        subtitleLevel.text = "Level \(GameBrain.shared.currentQuestion)"//потом можно вынести в переменные и передавать значения тут в зависимости от уровня пользователя и тд
-        coinLabel.text = "$\(GameBrain.shared.currentPrize)"
+        subtitleLevel.text = "Level \(finalAnswerCount)"
+        coinLabel.text = "$ " + moneyWon
         
         setupViews()
         setConstraints()
@@ -89,6 +103,11 @@ class ResultViewController: BaseViewController, QuestionManagerDelegate {
     
     func didUpdateQuestion(question: [QuestionModal]) {
         print(question)
+    }
+    ///Скрывает navigationBar перед показом view
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        navigationController?.navigationBar.isHidden = true
     }
     
     private func setupViews() {
@@ -109,16 +128,17 @@ class ResultViewController: BaseViewController, QuestionManagerDelegate {
         
         goToMainScreenButton.titleText = "Main screen"
         goToMainScreenButton.applyBackground(named: "BlueButton")
-        goToMainScreenButton.onTap = { 
-            self.goToMainScreenButton.buttonTappedAnimate()
-            GameBrain.shared.isGameInProgress = false
-            let vc = WelcomeViewController()
-            self.navigationController?.pushViewController(vc, animated: true)
+        goToMainScreenButton.onTap = { [weak self] in
+            /// удаляет из стэка все контроллеры до рутового
+            //TODO: - обнулить данные о предыдущей игре
+            self?.navigationController?.popToRootViewController(animated: true)
+            self?.navigationController?.navigationBar.isHidden = false
+            print("go to main screen")
+
         }
     }
     
     //MARK: - setConstraints
-    
     private func setConstraints() {
         logoImageView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 122).isActive = true
         logoImageView.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
@@ -138,8 +158,6 @@ class ResultViewController: BaseViewController, QuestionManagerDelegate {
         buttonsStack.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -32).isActive = true
         buttonsStack.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 32).isActive = true
         buttonsStack.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -60).isActive = true
-        
     }
-
 }
 

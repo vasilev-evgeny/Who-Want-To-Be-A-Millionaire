@@ -119,7 +119,7 @@ final class GameBrain {
     var sharedGameQuestions : [Question] {
         return newGameQuestion
     }
-    
+    var answers = Answer.getAnswerList()
     var currentQuestion = 0 // номер текущего вопроса, +1 к нему делаем когда кнопку НАЗАД нажимает на AnswerVC,его же можно привязать к indexPath в UITableViewCell, чтобы красить нужную по порядковому номеру ячейку
     
 //    var isAnswerCorrect = true // переменная чтобы проверять правильно ли ответил юзер или нет
@@ -133,7 +133,7 @@ final class GameBrain {
     var guaranteedPrize: Int = 0 //переменная для несгораемой суммы
     
     var isWalkAwayAvailable: Bool = true //переменная проверить, можно ли забрать деньги досрочно
-    
+    //TODO: - удалить если не нужны т.к. есть hintButtons
     var helpButtonIsEnabled = true //cостояние кнопок подсказок
     var audienceButtonIsEnabled = true //cостояние кнопок подсказок
     var mistakeButtonIsEnabled = true //cостояние кнопок подсказок

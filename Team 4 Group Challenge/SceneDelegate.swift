@@ -20,12 +20,12 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         
         let window: UIWindow = .init(windowScene: windowScene)
         self.window = window
-        let answers = Answer.getAnswerList()
-        let answerVC = AnswerModule(answers: answers)
+        let answers = GameBrain.shared.answers
+        let answerVC = AnswerViewController(answers: answers)
         let splashVC = SplashViewController()
         let gameVC = GameViewController()
-
         let navController = UINavigationController(rootViewController: splashVC)
+
         window.rootViewController = navController
         navController.setNavigationBarHidden(true, animated: false)
         window.makeKeyAndVisible()
