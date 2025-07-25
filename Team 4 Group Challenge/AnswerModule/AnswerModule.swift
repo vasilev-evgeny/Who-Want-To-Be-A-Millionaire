@@ -6,20 +6,13 @@
 //
 import UIKit
 
-class AnswerModule: UIViewController {
+class AnswerViewController: BaseViewController {
     //MARK: - Properties
-    var answers: [Answer]
+    private var answers: [Answer]
+    private var isShowContinueButton: Bool
     
     //MARK: - Create UI
-    private let backgroundImageView = {
-        let imageView = UIImageView()
-        imageView.contentMode = .scaleAspectFill
-        let image = UIImage(resource: .background)
-        imageView.image = image
-        
-        return imageView
-    }()
-    private let logoImageView = {
+    private let gameLogoImageView = {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFit
         let image = UIImage(resource: .gameLogo)
@@ -38,6 +31,24 @@ class AnswerModule: UIViewController {
         button.addAction(UIAction(handler: { [weak self] _ in
             self?.getMoneyButtonPressed()
         }), for: .touchUpInside)
+        button.isHidden = !isShowContinueButton
+        button.translatesAutoresizingMaskIntoConstraints = false
+        
+        return button
+    }()
+    private lazy var continueButton = {
+        let button = Button()
+        button.titleText = "Continue"
+        button.applyBackground(named: "BlueButton")
+        ///Запускает таймер и музыку после закрытия
+        button.onTap = { [weak self] in
+            self?.continueButtonPressed() { [weak self] in
+                guard let gameVC = self?.navigationController?.topViewController as? GameViewController else { return }
+                CountdownTimer.shared.startTimer(viewController: gameVC)
+                SoundManager.shared.play(.background)
+            }
+        }
+        button.isHidden = !isShowContinueButton
         button.translatesAutoresizingMaskIntoConstraints = false
         
         return button
@@ -58,8 +69,9 @@ class AnswerModule: UIViewController {
     }()
     
     //MARK: - Lifecycle
-    init(answers: [Answer]) {
-        self.answers = Answer.getAnswerList()
+    init(answers: [Answer], isShowContinueButton: Bool = false) {
+        self.isShowContinueButton = isShowContinueButton
+        self.answers = answers
         super.init(nibName: nil, bundle: nil)
     }
     required init?(coder: NSCoder) {
@@ -70,31 +82,25 @@ class AnswerModule: UIViewController {
         setupViews()
         setConstraints()
     }
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        navigationController?.navigationBar.isHidden = false
+    }
     //MARK: - Methods
     private func getMoneyButtonPressed() {
-    //TODO: - Make open score view and finish game
-        ///This function just for checking the action
-        print(#function)
-        for i in 0..<answers.count {
-            if answers[i].isCurrent {
-                answers[i].isCurrent = false
-                if i > 0 {
-                    answers[i-1].isCurrent = true
-                } else {
-                    answers[14].isCurrent = true
-                    break
-                }
-            }
-        }
-        tableView.reloadData()
+        let currentQuestion = GameBrain.shared.currentQuestion
+        let money = GameBrain.shared.currentPrize
+        SoundManager.shared.stopMusic()
+        let resultVC = ResultViewController(moneyWon: money , finalAnswerCount: currentQuestion)
+        navigationController?.pushViewController(resultVC, animated: true)
+    }
+    private func continueButtonPressed(completition: (() -> Void)) {
+        navigationController?.popViewController(animated: true)
+        completition()
     }
     //MARK: - setLayout
     private func setupViews() {
-        setBackground()
-    }
-    private func setBackground() {
-        view.addSubview(backgroundImageView)
-        backgroundImageView.frame = view.bounds
+        navigationController?.navigationBar.isHidden = true
     }
     
     //MARK: - setConstraints
@@ -102,6 +108,7 @@ class AnswerModule: UIViewController {
         view.addSubview(getMoneyButton)
         view.addSubview(tableView)
         view.addSubview(logoImageView)
+        view.addSubview(continueButton)
         
         NSLayoutConstraint.activate([
             logoImageView.topAnchor.constraint(equalTo: view.topAnchor, constant: 76),
@@ -117,13 +124,18 @@ class AnswerModule: UIViewController {
             tableView.topAnchor.constraint(equalTo: view.topAnchor, constant: 146),
             tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
             tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
-            tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+            tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            
+            continueButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            continueButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -10),
+            continueButton.widthAnchor.constraint(equalToConstant: view.frame.width / 2.6),
+            continueButton.heightAnchor.constraint(equalToConstant: 36)
         ])
     }
 }
 
 //MARK: - TableView Delegate and DataSource
-extension AnswerModule: UITableViewDelegate, UITableViewDataSource {
+extension AnswerViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         answers.count
     }
@@ -136,7 +148,3 @@ extension AnswerModule: UITableViewDelegate, UITableViewDataSource {
         return cell
     }
 }
-
-//#Preview {
-//    AnswerViewController(answers: Answer.getAnswerList())
-//}

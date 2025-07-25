@@ -37,7 +37,7 @@ extension Answer {
             Answer(questionNumber: 4, questionPrice: "3,000", type: .regular, isCurrent: false),
             Answer(questionNumber: 3, questionPrice: "2,000", type: .regular, isCurrent: false),
             Answer(questionNumber: 2, questionPrice: "1,000", type: .regular, isCurrent: false),
-            Answer(questionNumber: 1, questionPrice: "500", type: .regular, isCurrent: true),
+            Answer(questionNumber: 1, questionPrice: "500", type: .regular, isCurrent: false),
             
         ]
     }
