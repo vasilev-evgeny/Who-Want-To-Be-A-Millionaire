@@ -16,17 +16,18 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // Use this method to optionally configure and attach the UIWindow `window` to the provided UIWindowScene `scene`.
         // If using a storyboard, the `window` property will automatically be initialized and attached to the scene.
         // This delegate does not imply the connecting scene or session are new (see `application:configurationForConnectingSceneSession` instead).
-        guard let _ = (scene as? UIWindowScene) else { return }
         guard let windowScene = (scene as? UIWindowScene) else { return }
         
         let window: UIWindow = .init(windowScene: windowScene)
+        self.window = window
         let answers = Answer.getAnswerList()
-        let answerVC = AnswerViewController(answers: answers)
+        let answerVC = AnswerModule(answers: answers)
         let splashVC = SplashViewController()
         let gameVC = GameViewController()
-        let navController = UINavigationController(rootViewController: gameVC)
-        window.rootViewController = ResultViewController()//navController //Здесь пишем свой ViewController, чтобы запускать только его
-        self.window = window
+
+        let navController = UINavigationController(rootViewController: ResultViewController())
+        window.rootViewController = navController
+        navController.setNavigationBarHidden(true, animated: false)
         window.makeKeyAndVisible()
     }
 

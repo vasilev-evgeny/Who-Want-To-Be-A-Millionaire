@@ -7,13 +7,17 @@
 import UIKit
 
 class GameViewController: UIViewController {
-    
     enum Constants {
     }
+
+    
+    let game = GameBrain.shared
+    
     //MARK: - Create UI Items
     
     let mainView : UIImageView = {
         let mainView = UIImageView(image: UIImage(named: "Background"))
+        mainView.isUserInteractionEnabled = true
         mainView.translatesAutoresizingMaskIntoConstraints = false
         return mainView
     }()
@@ -43,9 +47,6 @@ class GameViewController: UIViewController {
     
     let topTitleLabel : UILabel = {
         let topTitleLabel = UILabel()
-        topTitleLabel.text = "QUESTION #"
-        topTitleLabel.textColor = .white
-        topTitleLabel.font = UIFont.systemFont(ofSize: 18)
         topTitleLabel.alpha = 0.5
         topTitleLabel.textAlignment = .center
         topTitleLabel.backgroundColor = .clear
@@ -85,8 +86,17 @@ class GameViewController: UIViewController {
     }()
     
     let timerImage : UIImageView = {
-        let timerImage = UIImageView(image: UIImage(named: "stopwatch"))
+        let timerImage = UIImageView()
         timerImage.translatesAutoresizingMaskIntoConstraints = false
+        timerImage.image?.withRenderingMode(.alwaysTemplate)
+        
+        // Делаем timerImage tintable
+        if let image = UIImage(named: "stopwatch") {
+            let tintedTimerImage = image.withRenderingMode(.alwaysTemplate)
+            timerImage.image = tintedTimerImage
+            timerImage.tintColor = .white
+        }
+        
         return timerImage
     }()
     
@@ -103,6 +113,7 @@ class GameViewController: UIViewController {
         questionTextView.isSelectable = false
         questionTextView.isScrollEnabled = false
         questionTextView.clipsToBounds = true
+        questionTextView.textContainer.lineFragmentPadding = 0
         questionTextView.textContainerInset = .zero
         questionTextView.textContainer.lineFragmentPadding = 0
         questionTextView.layer.borderWidth = 0
@@ -112,7 +123,7 @@ class GameViewController: UIViewController {
     }()
     
     //MARK: - Answers Section
-    let answersStack : UIStackView = {
+    var answersStack : UIStackView = {
         let answersStack = UIStackView()
         answersStack.axis = .vertical
         answersStack.spacing = 16
@@ -121,23 +132,24 @@ class GameViewController: UIViewController {
         return answersStack
     }()
     
-    let answerButtonsTitles = ["A": "Title1", "B": "Title2", "C": "Title3", "D": "Title4"]
     var answersButtonArray = [UIButton]()
     
-    private func createAnswerButton(letter: String, title: String) -> UIButton {
+    private func createAnswerButton(letter: Int, title: String) -> UIButton {
         let button = UIButton()
+        let letters = ["A","B", "C", "D"]
         let titleText = NSMutableAttributedString()
-        titleText.append(attributedText(text: "\(letter):  ", fontSize: 18, color: UIColor(red: 225/255, green: 155/255, blue: 48/255, alpha: 1), firstLineIntend: 30))
+        titleText.append(attributedText(text: "\(letters[letter]):  ", fontSize: 18, color: UIColor(red: 225/255, green: 155/255, blue: 48/255, alpha: 1), firstLineIntend: 30))
         titleText.append(attributedText(text: title, fontSize: 18, color: .white))
         button.setBackgroundImage(UIImage(named: "BlueButton"), for: .normal)
         button.setAttributedTitle(titleText, for: .normal)
         button.contentHorizontalAlignment = .left
+        button.addTarget(self, action: #selector(answerButtonPressed), for: .touchUpInside)
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }
     
     //MARK: - Hints Section
-    let hintsStack : UIStackView = {
+    var hintsStack : UIStackView = {
         let hintsStack = UIStackView()
         hintsStack.axis = .horizontal
         hintsStack.alignment = .fill
@@ -147,12 +159,14 @@ class GameViewController: UIViewController {
         return hintsStack
     }()
     
-    let hintButtonsImages = ["50_50", "audience", "call"]
+    
     var hintButtons = [UIButton]()
     
-    private func createHintButton(image: String) -> UIButton {
+    private func createHintButton(image: String, state: Bool) -> UIButton {
         let button = UIButton()
         button.setBackgroundImage(UIImage(named: image), for: .normal)
+        button.isEnabled = state
+        button.alpha = state ? 1 : 0.5
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }
@@ -162,16 +176,19 @@ class GameViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        guard !game.isGameOver else {
+            return gameOver()
+        }
         setupUI()
+        CountdownTimer.shared.startTimer(viewController: self)
+        SoundManager.shared.play(.background)
     }
     
-    private func setupViews() {
-        func viewWillAppear(_ animated: Bool) {
-            super.viewWillAppear(animated)
-            navigationController?.setNavigationBarHidden(false, animated: true)
-        }
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        navigationController?.setNavigationBarHidden(false, animated: true)
     }
-        
+    
         //MARK: - Setup UI
         
         func setupUI() {
@@ -194,6 +211,8 @@ class GameViewController: UIViewController {
                 backButton.topAnchor.constraint(equalTo: backButtonContainter.topAnchor),
                 backButton.centerXAnchor.constraint(equalTo: backButtonContainter.centerXAnchor),
             ])
+            backButton.addTarget(self, action: #selector(pushBackButton), for: .touchUpInside)
+            
             navigationItem.leftBarButtonItem = UIBarButtonItem(customView: backButtonContainter)
             
             chartButtonContainter.addSubview(chartButton)
@@ -204,13 +223,15 @@ class GameViewController: UIViewController {
                 chartButton.topAnchor.constraint(equalTo: chartButtonContainter.topAnchor),
                 chartButton.centerXAnchor.constraint(equalTo: chartButtonContainter.centerXAnchor),
             ])
+            chartButton.addTarget(self, action: #selector(pushChartButton), for: .touchUpInside)
             navigationItem.rightBarButtonItem = UIBarButtonItem(customView: chartButtonContainter)
             
             labelStack.addArrangedSubview(topTitleLabel)
             labelStack.addArrangedSubview(bottomTitleLabel)
             
             navigationItem.titleView = labelStack
-            bottomTitleLabel.attributedText = attributedText(text: "$", fontSize: 19, color: .white)
+            topTitleLabel.attributedText = attributedText(text: "QUESTION #\(game.currentQuestion + 1)", fontSize: 18, color: .white)
+            bottomTitleLabel.attributedText = attributedText(text: "$\(game.currentPrize)", fontSize: 19, color: .white)
             
             //MARK: - Timer UI
             
@@ -237,7 +258,8 @@ class GameViewController: UIViewController {
                 timerCounter.widthAnchor.constraint(equalToConstant: 27),
                 timerCounter.heightAnchor.constraint(equalToConstant: 29)
             ])
-            timerCounter.attributedText = attributedText(text: "60", fontSize: 22, color: .white)
+            timerCounter.attributedText = attributedText(text: "30", fontSize: 22, color: .white)
+
             
             //MARK: - Question Section UI
             mainView.addSubview(questionTextView)
@@ -247,7 +269,7 @@ class GameViewController: UIViewController {
                 questionTextView.trailingAnchor.constraint(equalTo: mainView.trailingAnchor, constant: -32),
                 questionTextView.heightAnchor.constraint(equalToConstant: 147)
             ])
-            questionTextView.attributedText = attributedText(text: "What year was the year, when first deodorant was invented in our life?", fontSize: 24, color: .white)
+            questionTextView.attributedText = attributedText(text: game.sharedGameQuestions[game.currentQuestion].question, fontSize: 24, color: .white)
             
             //MARK: - Answers Section UI
             mainView.addSubview(answersStack)
@@ -257,33 +279,35 @@ class GameViewController: UIViewController {
                 answersStack.trailingAnchor.constraint(equalTo: mainView.trailingAnchor, constant: -32),
                 answersStack.heightAnchor.constraint(equalToConstant: 272)
             ])
-            let sortedAnswerButtonsTitles = answerButtonsTitles.sorted { $0.key < $1.key }
-            for (key, value) in sortedAnswerButtonsTitles {
+            let answerButtonsTitles = game.sharedGameQuestions[game.currentQuestion].answers.shuffled()
+            
+            for (key, value) in answerButtonsTitles.enumerated() {
                 answersButtonArray.append(createAnswerButton(letter: key, title: value))
             }
-            answersButtonArray.forEach { answersStack.addArrangedSubview($0)
+            answersButtonArray.forEach {
+                answersStack.addArrangedSubview($0)
             }
-            
+           
             //MARK: - Hints UI
             mainView.addSubview(hintsStack)
             NSLayoutConstraint.activate([
                 hintsStack.topAnchor.constraint(equalTo: answersStack.bottomAnchor, constant: 40),
                 hintsStack.centerXAnchor.constraint(equalTo: answersStack.centerXAnchor),
-                hintsStack.heightAnchor.constraint(equalToConstant: 64),
-                //            hintsStack.leadingAnchor.constraint(equalTo: mainView.leadingAnchor, constant: 32),
-                //            hintsStack.trailingAnchor.constraint(equalTo: mainView.trailingAnchor, constant: -32)
+                hintsStack.heightAnchor.constraint(equalToConstant: 64)
             ])
-            hintButtonsImages.forEach {
-                hintButtons.append(createHintButton(image: $0))
+            game.hintButtons.forEach {
+                hintButtons.append(createHintButton(image: $0.0, state: $0.1))
             }
             hintButtons.forEach {
                 hintsStack.addArrangedSubview($0)
-                //            $0.widthAnchor.constraint(equalToConstant: 84).isActive = true
-                //            $0.heightAnchor.constraint(equalToConstant: 64).isActive = true
             }
-            
         }
+    
+
         //MARK: func attributedText
+
+    
+    
         func attributedText(text: String, fontSize: CGFloat, color: UIColor, firstLineIntend: CGFloat = 0) -> NSAttributedString {
             let paragraphStyle = NSMutableParagraphStyle()
             paragraphStyle.firstLineHeadIndent = firstLineIntend
@@ -294,7 +318,107 @@ class GameViewController: UIViewController {
                 .paragraphStyle: paragraphStyle
             ]
             return NSAttributedString(string: text, attributes: attributes)
-            
+        }
+    
+    //MARK: - Action Func
+    
+    @objc func pushBackButton(sender: UIButton) {
+        sender.buttonTappedAnimate()
+        SoundManager.shared.stopMusic()
+        let targetVC = WelcomeViewController()
+        self.navigationController?.pushViewController(targetVC, animated: true)
+        targetVC.navigationItem.hidesBackButton = true
+    }
+    
+    @objc func pushChartButton(sender: UIButton) {
+        sender.buttonTappedAnimate()
+        let targetVC = AnswerModule(answers: Answer.getAnswerList())
+        self.navigationController?.pushViewController(targetVC, animated: true)
+        targetVC.navigationItem.hidesBackButton = true
+        DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
+            self.navigationController?.popViewController(animated: true)
         }
     }
+    
+    @objc func answerButtonPressed(_ sender: Button) {
+        sender.buttonTappedAnimate()
+        SoundManager.shared.play(.suspense)
+        CountdownTimer.shared.stopTimer()
+        sender.setBackgroundImage(UIImage(named: "YellowButton"), for: .normal)
+        guard let title = sender.currentAttributedTitle?.string else { return }
+        
+        
+        let isCorrectAnswer = title.hasSuffix(game.sharedGameQuestions[game.currentQuestion].correctAnswer)
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+            if isCorrectAnswer {
+                SoundManager.shared.play(.correct)
+                sender.setBackgroundImage(UIImage(named: "right_answer"), for: .normal)
+                sender.blink()
+                if self.game.currentPrize > self.game.allTimeRecord {
+                    self.game.allTimeRecord = self.game.currentPrize
+                }
+                DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+                    self.game.guaranteedPrize =  (self.game.currentQuestion + 1) % 5 == 0 ? self.game.currentPrize : self.game.guaranteedPrize
+                    self.awakeAnswerModule()
+                    if self.game.currentQuestion == (self.game.sharedGameQuestions.count - 1) {
+                        self.gameOver()
+                    } else {
+                        self.game.currentQuestion += 1
+                        self.clearStack(for: &self.answersStack)
+                        
+                        self.clearStack(for: &self.hintsStack)
+                        self.answersButtonArray = []
+                        self.hintButtons = []
+                        self.setupUI()
+                        
+                    }
+                }
+                
+            }
+            else {
+                SoundManager.shared.play(.wrong)
+                sender.setBackgroundImage(UIImage(named: "wrong_answer"), for: .normal)
+                DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+                    self.gameOver()
+                }
+            }
+        }
 
+    }
+    
+    func awakeAnswerModule() {
+        let targetVC = AnswerModule(answers: Answer.getAnswerList())
+        self.navigationController?.pushViewController(targetVC, animated: true)
+        targetVC.navigationItem.hidesBackButton = true
+        DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
+            self.navigationController?.popViewController(animated: true)
+            CountdownTimer.shared.startTimer(viewController: self)
+            SoundManager.shared.play(.background)
+        }
+        
+    }
+    
+    func gameOver() {
+        let targetVC = ResultViewController()
+        self.navigationController?.pushViewController(targetVC, animated: true)
+        targetVC.navigationItem.hidesBackButton = true
+    }
+    
+    func clearStack(for stack: inout UIStackView) {
+        for subview in stack.arrangedSubviews {
+            stack.removeArrangedSubview(subview)
+            subview.removeFromSuperview()
+        }
+    }
+}
+
+//MARK: - Extension UIView
+
+extension UIView {
+    func blink(duration: TimeInterval = 0.5, delay: TimeInterval = 0.0, alpha: CGFloat = 0.0) {
+        UIView.animate(withDuration: duration, delay: delay, options: [.curveEaseInOut, .repeat, .autoreverse]) {
+            self.alpha = alpha
+        }
+    }
+}

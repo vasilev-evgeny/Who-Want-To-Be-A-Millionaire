@@ -6,7 +6,7 @@
 //
 import UIKit
 
-class AnswerViewController: UIViewController {
+class AnswerModule: UIViewController {
     //MARK: - Properties
     var answers: [Answer]
     
@@ -123,7 +123,7 @@ class AnswerViewController: UIViewController {
 }
 
 //MARK: - TableView Delegate and DataSource
-extension AnswerViewController: UITableViewDelegate, UITableViewDataSource {
+extension AnswerModule: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         answers.count
     }
