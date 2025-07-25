@@ -150,9 +150,9 @@ final class GameBrain {
         self.hard = hard.shuffled()
         currentQuestion = 0
         guaranteedPrize = 0
-        helpButtonIsEnabled = true
-        audienceButtonIsEnabled = true
-        mistakeButtonIsEnabled = true
+        hintButtons[0].1 = true
+        hintButtons[1].1 = true
+        hintButtons[2].1 = true
     }
 //    func createQuestionArray() {
 //        if newGameQuestion.isEmpty {
