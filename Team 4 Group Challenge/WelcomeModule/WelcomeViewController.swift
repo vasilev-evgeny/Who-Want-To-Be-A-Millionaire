@@ -90,7 +90,6 @@ class WelcomeViewController: UIViewController {
     
     let allTimeCashLabel : UILabel = {
         let label = UILabel()
-        label.text = "$\(GameBrain.shared.allTimeRecord)"
         label.font = UIFont.systemFont(ofSize: 24, weight: .semibold)
         label.textColor = UIColor.white
         label.textAlignment = .center
@@ -143,6 +142,15 @@ class WelcomeViewController: UIViewController {
         }
     }
     
+    func checkRecord() {
+        if UserDefaults.standard.string(forKey: "allTimeRecord") == nil {
+            allTimeCashLabel.text = "$0"
+        } else {
+            print(UserDefaults.standard.string(forKey: "allTimeRecord")!)
+            allTimeCashLabel.text = "$ \(UserDefaults.standard.string(forKey: "allTimeRecord")!)"
+        }
+    }
+    
     //MARK: - Lifecycle
     
     override func viewDidLoad() {
@@ -150,6 +158,7 @@ class WelcomeViewController: UIViewController {
         setupViews()
         setConstraints()
         checkGameStatus()
+        checkRecord()
     }
     
     private func setupViews() {
