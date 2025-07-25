@@ -25,7 +25,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let splashVC = SplashViewController()
         let gameVC = GameViewController()
         let navController = UINavigationController(rootViewController: gameVC)
-        window.rootViewController = navController //Здесь пишем свой ViewController, чтобы запускать только его
+        window.rootViewController = ResultViewController()//navController //Здесь пишем свой ViewController, чтобы запускать только его
         self.window = window
         window.makeKeyAndVisible()
     }

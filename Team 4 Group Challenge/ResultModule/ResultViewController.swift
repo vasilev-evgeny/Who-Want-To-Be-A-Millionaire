@@ -6,11 +6,13 @@
 //
 import UIKit
 
-class ResultViewController: BaseViewController {
+class ResultViewController: BaseViewController, QuestionManagerDelegate {
 
     enum Constants {
 
     }
+    
+    var questionManager = QuestionManager()
     
     private let startNewGameButton = Button()
     private let goToMainScreenButton = Button()
@@ -84,6 +86,12 @@ class ResultViewController: BaseViewController {
         
         setupViews()
         setConstraints()
+        
+        questionManager.delegate = self
+    }
+    
+    func didUpdateQuestion(question: [QuestionModal]) {
+        print(question)
     }
     
     private func setupViews() {
@@ -96,6 +104,8 @@ class ResultViewController: BaseViewController {
         startNewGameButton.applyBackground(named: "YellowButton")
         startNewGameButton.onTap = {
             print("Start new game")
+            self.questionManager.fetchQuestions("hard")
+            
         }
         
         goToMainScreenButton.titleText = "Main screen"
