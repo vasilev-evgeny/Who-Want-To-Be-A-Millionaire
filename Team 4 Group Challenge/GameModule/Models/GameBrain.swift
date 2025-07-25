@@ -93,6 +93,7 @@ final class GameBrain {
     ]
     
     private var newGameQuestion = [Question]()
+    var answers = Answer.getAnswerList()
     
     func createQuestionArray() {
         if newGameQuestion.isEmpty {

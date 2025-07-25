@@ -178,9 +178,7 @@ class GameViewController: UIViewController {
     //MARK: - Methods
     
     private func chartButtonPressed() {
-        let vc = AnswerViewController(answers: Answer.getAnswerList())
-        
-        navigationController?.pushViewController(vc, animated: true)
+        showAnswerModule()
     }
     
     //MARK: - Setup UI
@@ -306,6 +304,21 @@ class GameViewController: UIViewController {
         ]
         return NSAttributedString(string: text, attributes: attributes)
         
+    }
+    /// метод показывает AnswerModule с текущим вопросом
+    private func showAnswerModule() {
+        var answers = GameBrain.shared.answers
+        let cur = 14 - GameBrain.shared.currentQuestion
+        answers[cur].isCurrent = true
+        let vc = AnswerViewController(answers: answers)
+        navigationController?.pushViewController(vc, animated: true)
+    }
+    /// метод делает кнопку неактивной и затемняет ее
+    private func turnOffHintButton(_ hintNumber: Int) {
+        hintButtons[hintNumber].isEnabled = false
+        let hideLayer = CALayer()
+        hideLayer.backgroundColor = UIColor.black.withAlphaComponent(0.5).cgColor
+        hintButtons[hintNumber].layer.addSublayer(hideLayer)
     }
 }
 

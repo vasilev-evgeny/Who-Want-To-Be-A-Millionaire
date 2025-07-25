@@ -70,7 +70,7 @@ class AnswerViewController: BaseViewController {
     
     //MARK: - Lifecycle
     init(answers: [Answer]) {
-        self.answers = Answer.getAnswerList()
+        self.answers = answers
         super.init(nibName: nil, bundle: nil)
     }
     required init?(coder: NSCoder) {
@@ -81,11 +81,12 @@ class AnswerViewController: BaseViewController {
         setupViews()
         setConstraints()
     }
+    
    
     //MARK: - Methods
     private func getMoneyButtonPressed() {
         let currentQuestion = GameBrain.shared.currentQuestion
-        let money = answers[currentQuestion].questionPrice
+        let money = currentQuestion > 0 ? answers[15 - currentQuestion].questionPrice : "0"
         
         navigationController?.pushViewController(ResultViewController(moneyWon: money , finalAnswerCount: currentQuestion), animated: true)
     }
