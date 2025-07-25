@@ -6,7 +6,7 @@
 //
 import UIKit
 
-class ResultViewController: BaseViewController {
+class ResultViewController: BaseViewController, QuestionManagerDelegate {
 
     enum Constants {
 
@@ -84,6 +84,11 @@ class ResultViewController: BaseViewController {
         
         setupViews()
         setConstraints()
+        
+    }
+    
+    func didUpdateQuestion(question: [QuestionModal]) {
+        print(question)
     }
     
     private func setupViews() {
@@ -96,6 +101,7 @@ class ResultViewController: BaseViewController {
         startNewGameButton.applyBackground(named: "YellowButton")
         startNewGameButton.onTap = {
             print("Start new game")
+            
         }
         
         goToMainScreenButton.titleText = "Main screen"
