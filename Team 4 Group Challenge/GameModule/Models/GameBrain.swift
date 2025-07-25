@@ -94,23 +94,23 @@ final class GameBrain {
         )
     ]
     
-    private let questionsWorth = [
-        "500",
-        "1,000",
-        "2,000",
-        "3,000",
-        "5,000",
-        "7,500",
-        "10,000",
-        "12,000",
-        "15,000",
-        "25,000",
-        "50,000",
-        "100,000",
-        "250,000",
-        "500,000",
-        "1,000,000"
-    ]
+//    private let questionsWorth = [
+//        "500",
+//        "1,000",
+//        "2,000",
+//        "3,000",
+//        "5,000",
+//        "7,500",
+//        "10,000",
+//        "12,000",
+//        "15,000",
+//        "25,000",
+//        "50,000",
+//        "100,000",
+//        "250,000",
+//        "500,000",
+//        "1,000,000"
+//    ]
     
     private var newGameQuestion : [Question] {
         return easy + medium + hard
@@ -119,7 +119,7 @@ final class GameBrain {
     var sharedGameQuestions : [Question] {
         return newGameQuestion
     }
-    
+    var answers = Answer.getAnswerList()
     var currentQuestion = 0 // номер текущего вопроса, +1 к нему делаем когда кнопку НАЗАД нажимает на AnswerVC,его же можно привязать к indexPath в UITableViewCell, чтобы красить нужную по порядковому номеру ячейку
     
 //    var isAnswerCorrect = true // переменная чтобы проверять правильно ли ответил юзер или нет
@@ -127,13 +127,13 @@ final class GameBrain {
     var isGameOver = false //переменная чтобы чекать, закончилась ли игра
     
     var currentPrize: String {
-        return questionsWorth[currentQuestion]
+        return currentQuestion > 0 ? answers[15 - currentQuestion].questionPrice : "0"
     }  //переменная для текущего выигрыша
     
     var guaranteedPrize: String = "0" //переменная для несгораемой суммы
     
     var isWalkAwayAvailable: Bool = true //переменная проверить, можно ли забрать деньги досрочно
-    
+    //TODO: - удалить если не нужны т.к. есть hintButtons
     var helpButtonIsEnabled = true //cостояние кнопок подсказок
     var audienceButtonIsEnabled = true //cостояние кнопок подсказок
     var mistakeButtonIsEnabled = true //cостояние кнопок подсказок
