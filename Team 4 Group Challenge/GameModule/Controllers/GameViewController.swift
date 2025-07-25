@@ -389,6 +389,7 @@ class GameViewController: UIViewController {
         SoundManager.shared.stopMusic()
         navigationController?.pushViewController(targetVC, animated: true)
         targetVC.navigationController?.isNavigationBarHidden = true
+
     }
     
     func clearStack(for stack: inout UIStackView) {

@@ -6,7 +6,7 @@
 //
 import UIKit
 
-class ResultViewController: BaseViewController {
+class ResultViewController: BaseViewController, QuestionManagerDelegate {
 
     enum Constants {
 
@@ -98,6 +98,11 @@ class ResultViewController: BaseViewController {
         
         setupViews()
         setConstraints()
+        
+    }
+    
+    func didUpdateQuestion(question: [QuestionModal]) {
+        print(question)
     }
     ///Скрывает navigationBar перед показом view
     override func viewWillAppear(_ animated: Bool) {
@@ -114,7 +119,11 @@ class ResultViewController: BaseViewController {
         startNewGameButton.titleText = "New game"
         startNewGameButton.applyBackground(named: "YellowButton")
         startNewGameButton.onTap = {
-            print("Start new game")
+            self.startNewGameButton.buttonTappedAnimate()
+            GameBrain.shared.isGameInProgress = true
+            GameBrain.shared.refreshGame()
+            let gameVC = GameViewController()
+            self.navigationController?.pushViewController(gameVC, animated: true)
         }
         
         goToMainScreenButton.titleText = "Main screen"
@@ -125,6 +134,7 @@ class ResultViewController: BaseViewController {
             self?.navigationController?.popToRootViewController(animated: true)
             self?.navigationController?.navigationBar.isHidden = false
             print("go to main screen")
+
         }
     }
     
