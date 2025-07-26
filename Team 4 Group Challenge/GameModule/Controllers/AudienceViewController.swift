@@ -34,7 +34,7 @@ class AudienceViewController: BaseViewController {
             answerBarChart.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             answerBarChart.centerYAnchor.constraint(equalTo: view.centerYAnchor),
             answerBarChart.widthAnchor.constraint(equalTo: view.safeAreaLayoutGuide.widthAnchor, multiplier: 0.9),
-            answerBarChart.heightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.heightAnchor, multiplier: 0.9)
+            answerBarChart.heightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.heightAnchor, multiplier: 0.8)
         ])
         answerBarChart.setBarValues(audienceAnswer)
         DispatchQueue.main.asyncAfter(deadline: .now() + 5) {

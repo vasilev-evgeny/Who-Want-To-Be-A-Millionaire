@@ -383,7 +383,8 @@ class GameViewController: UIViewController {
                         self.answersButtonArray = []
                         self.hintButtons = []
                         self.setupUI()
-                        print(self.game.sharedGameQuestions[self.game.currentQuestion].correctAnswer)
+                        
+//                        print(self.game.sharedGameQuestions[self.game.currentQuestion].correctAnswer)
                     }
                 }
             }
@@ -441,6 +442,11 @@ class GameViewController: UIViewController {
         let hideLayer = CALayer()
         hideLayer.backgroundColor = UIColor.black.withAlphaComponent(0.5).cgColor
         sender.layer.addSublayer(hideLayer)
+        let barrierView = UIView()
+        barrierView.backgroundColor = .clear
+        barrierView.frame = hintsStack.frame
+//        view.addSubview(barrierView)
+        
         guard let type = sender.titleLabel?.text else { return }
         switch type {
         case game.hintButtons[0].0:
@@ -455,6 +461,9 @@ class GameViewController: UIViewController {
         default:
             break
         }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            barrierView.isHidden = true
+        }
     }
     // Скрывает два неверных варианта
     private func hideTwoWrongAnswers() {
@@ -465,7 +474,11 @@ class GameViewController: UIViewController {
                 setAnswers.insert(i)
             }
         }
+        
         setAnswers.removeFirst()
+        if setAnswers.count == 3 {
+            setAnswers.removeFirst()
+        }
         for i in setAnswers {
             answersButtonArray[i].setAttributedTitle(nil, for: .normal)
             answersButtonArray[i].isEnabled = false
@@ -475,7 +488,9 @@ class GameViewController: UIViewController {
     private func useAudience(_ sender: UIButton) {
 
         let winrate = game.currentQuestion < 10 ? 70 : 50
-        let audienceElection =  audienceElection(correctAnswer: game.sharedGameQuestions[game.currentQuestion].correctAnswer, answers: answerButtonsTitles, currentAnswerWinRate: winrate)
+        let arrAnswers = getAvailableAnswerOption(with: winrate)
+        guard let audienceAnswer = arrAnswers.shuffled().randomElement() else { return }
+        let audienceElection = createDataForChart(maxAudienceOption: audienceAnswer, availableAnswer: arrAnswers)
                              
         let audienceVC = AudienceViewController(audienceAnswer: audienceElection)
         audienceVC.modalPresentationStyle = .popover
@@ -487,13 +502,14 @@ class GameViewController: UIViewController {
     /// Метод useAudience только с 50%
     /// Потенциально переделается для продвинутого задания
     private func useFriendCall(_ sender: UIButton) {
-        let arrAnswers = getAvailableAnswerOption(winrate: 50)
+        let arrAnswers = getAvailableAnswerOption(with: 50)
         guard let audienceAnswer = arrAnswers.shuffled().randomElement() else { return }
         
         let audienceVC = CallFriendViewController(audienceAnswer: audienceAnswer)
         audienceVC.modalPresentationStyle = .popover
         audienceVC.preferredContentSize = CGSize(width: 200, height: 200)
         audienceVC.popoverPresentationController?.sourceView = sender
+        audienceVC.popoverPresentationController?.permittedArrowDirections = .down
         audienceVC.popoverPresentationController?.delegate = self
         present(audienceVC, animated: true)
     }
@@ -527,47 +543,23 @@ class GameViewController: UIViewController {
         }
         
         return arrAnswers
-        
     }
-    /// Формируем массив с результатами зретильского голосования с заданным процентов выбора верного ответа
-    private func audienceElection(correctAnswer: String, answers: [String], currentAnswerWinRate: Int) -> [CGFloat] {
-        
-        let wrongAnswers = answers.filter { $0 != correctAnswer }
-        
-        var result = [Int]()
-        
-        let aAnswer = currentAnswerWinRate
-        let bAnswer = Int.random(in: 0...(100 - aAnswer))
-        let cAnswer = Int.random(in: 0...(100 - aAnswer - bAnswer))
-        let dAnswer = 100 - aAnswer - bAnswer - cAnswer
-        
-        let ansA = Array(repeating: correctAnswer, count: aAnswer)
-        let ansB = Array(repeating: wrongAnswers[0], count: bAnswer)
-        let ansC = Array(repeating: wrongAnswers[1], count: cAnswer)
-        let ansD = Array(repeating: wrongAnswers[2], count: dAnswer)
-
-        let sum = (ansA + ansB + ansC + ansD).shuffled()
-
-        let countA = sum[0...aAnswer - 1].filter { $0 == correctAnswer }.count
-        let countB = sum[0...aAnswer - 1].filter { $0 == wrongAnswers[0] }.count
-        let countC = sum[0...aAnswer - 1].filter { $0 == wrongAnswers[1] }.count
-        let countD = sum[0...aAnswer - 1].filter { $0 == wrongAnswers[2] }.count
-        
-        for value in answers {
-            switch value {
-            case correctAnswer: result.append(countA)
-            case wrongAnswers[0]: result.append(countB)
-            case wrongAnswers[1]: result.append(countC)
-            case wrongAnswers[2]: result.append(countD)
-            default: break
-            }
+    private func createDataForChart(maxAudienceOption: String, availableAnswer: [String] ) -> [CGFloat] {
+        let maxCount = Int.random(in: 40...90)
+        var dicAnswers = ["A": 0,"B": 0, "C": 0, "D": 0]
+        dicAnswers[maxAudienceOption] = maxCount
+        for key in availableAnswer {
+            dicAnswers[key] = Int.random(in: 1...maxCount-10)
         }
         
-        return result.map { CGFloat($0) }
+        var resultArr = [CGFloat]()
+        dicAnswers.sorted(by: {$0.value < $1.value}).forEach {resultArr.append(CGFloat($0.value))}
+
+        return resultArr
     }
 
     /// Просматривает доступные варианты ответов и формирует массив из доступных ложных
-    private func getAvailableAnswerOption (winrate: Int) -> [String] {
+    private func getAvailableAnswerOption (with winrate: Int) -> [String] {
         let correctAnswer = game.sharedGameQuestions[game.currentQuestion].correctAnswer
         var arrAnswers = [String]()
         var trueAnswerChar = ""

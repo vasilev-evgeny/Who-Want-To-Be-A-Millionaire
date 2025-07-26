@@ -98,7 +98,6 @@ class ResultViewController: BaseViewController {
         
         setupViews()
         setConstraints()
-        
     }
     
     func didUpdateQuestion(question: [QuestionModal]) {
