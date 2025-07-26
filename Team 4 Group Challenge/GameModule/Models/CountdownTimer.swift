@@ -37,21 +37,29 @@ final class CountdownTimer {
         gameVC?.timerCounter.pulse()
 
         if secondsRemaining == 15 {
-            
-            gameVC?.timerView.layer.backgroundColor = UIColor.warningTimerView?.cgColor
-            gameVC?.timerImage.tintColor = UIColor.warningTimer
-            gameVC?.timerCounter.textColor = UIColor.warningTimerCounter
             gameVC?.timerCounter.pulse()
-
+            UIView.animate(withDuration: 0.4) {
+                self.gameVC?.timerView.layer.backgroundColor = UIColor.warningTimerView?.cgColor
+                self.gameVC?.timerImage.tintColor = UIColor.warningTimer
+                self.gameVC?.timerCounter.textColor = UIColor.warningTimerCounter
+            }
+            
         } else if secondsRemaining == 5 {
-            
-            gameVC?.timerView.layer.backgroundColor = UIColor.alertTimerView?.cgColor
-            gameVC?.timerImage.tintColor = UIColor.alertTimer
-            gameVC?.timerCounter.textColor = UIColor.alertTimerCounter
             gameVC?.timerCounter.pulse()
-            
+            UIView.animate(withDuration: 0.4) {
+                self.gameVC?.timerView.layer.backgroundColor = UIColor.alertTimerView?.cgColor
+                self.gameVC?.timerImage.tintColor = UIColor.alertTimer
+                self.gameVC?.timerCounter.textColor = UIColor.alertTimerCounter
+            }
         } else if secondsRemaining == 0 {
             stopTimer()
+            gameVC?.answersButtonArray.forEach { $0.isEnabled = false }
+            gameVC?.hintButtons.forEach { $0.isEnabled = false }
+            
+            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                self.gameVC?.gameOver()
+                SoundManager.shared.play(.wrong)
+            }
         }
     }
     
