@@ -144,6 +144,9 @@ class GameViewController: UIViewController {
         button.contentHorizontalAlignment = .left
         button.addTarget(self, action: #selector(answerButtonPressed), for: .touchUpInside)
         button.translatesAutoresizingMaskIntoConstraints = false
+        button.titleLabel?.lineBreakMode = .byTruncatingTail
+        button.titleLabel?.numberOfLines = 1
+        button.contentEdgeInsets = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 20)
         return button
     }
     
@@ -341,6 +344,7 @@ class GameViewController: UIViewController {
         sender.setBackgroundImage(UIImage(named: "YellowButton"), for: .normal)
         /// не дает нажать на кнопку после выбора варианта
         hintButtons.forEach { $0.isEnabled = false }
+        answersStack.arrangedSubviews.forEach {$0.isUserInteractionEnabled = false}
         guard let title = sender.currentAttributedTitle?.string else { return }
         
         let isCorrectAnswer = title.hasSuffix(game.sharedGameQuestions[game.currentQuestion].correctAnswer)
