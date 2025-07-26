@@ -574,7 +574,7 @@ class GameViewController: UIViewController {
         }
         
         var resultArr = [CGFloat]()
-        dicAnswers.sorted(by: {$0.value < $1.value}).forEach {resultArr.append(CGFloat($0.value))}
+        dicAnswers.sorted(by: {$0.key < $1.key}).forEach {resultArr.append(CGFloat($0.value))}
 
         return resultArr
     }
@@ -594,6 +594,9 @@ class GameViewController: UIViewController {
                     }
                 }
             }
+        }
+        if trueAnswerChar == "" {
+            trueAnswerChar = arrAnswers.removeFirst()
         }
         return makeRandomAnswersArray(from: arrAnswers, with: winrate, whereTrueIs: trueAnswerChar)
     }
