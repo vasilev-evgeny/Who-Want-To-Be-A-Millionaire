@@ -345,6 +345,8 @@ class GameViewController: UIViewController {
         sender.setBackgroundImage(UIImage(named: "YellowButton"), for: .normal)
         hintButtons.forEach { $0.isEnabled = false }
         answersStack.arrangedSubviews.forEach {$0.isUserInteractionEnabled = false}
+        backButton.isUserInteractionEnabled = false
+        self.chartButton.isUserInteractionEnabled = false
         guard let title = sender.currentAttributedTitle?.string else { return }
 
         
@@ -370,12 +372,13 @@ class GameViewController: UIViewController {
                     if self.game.currentQuestion == (self.game.sharedGameQuestions.count - 1) {
                         ///Обновляет кол-вол верных ответов
                         self.game.allTimeRecord = self.game.answers[0].questionPrice
-                        UserDefaults.standard.set(self.game.allTimeRecord, forKey: "allTimeRecord")
                         self.game.currentQuestion += 1
                         self.gameOver()
                         SoundManager.shared.play(.million)
                     } else {
                         self.awakeAnswerModule(isShowButton: true)
+                        self.backButton.isUserInteractionEnabled = true
+                        self.chartButton.isUserInteractionEnabled = true
                         self.game.currentQuestion += 1
                         self.clearStack(for: &self.answersStack)
                         
