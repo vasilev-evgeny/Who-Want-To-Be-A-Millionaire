@@ -6,7 +6,7 @@
 //
 import UIKit
 
-class ResultViewController: BaseViewController, QuestionManagerDelegate {
+class ResultViewController: BaseViewController {
     
     enum Constants {
 
@@ -131,10 +131,11 @@ class ResultViewController: BaseViewController, QuestionManagerDelegate {
         goToMainScreenButton.onTap = { [weak self] in
             /// удаляет из стэка все контроллеры до рутового
             //TODO: - обнулить данные о предыдущей игре
-            self?.navigationController?.popToRootViewController(animated: true)
+            
+            //self?.navigationController?.popToRootViewController(animated: true)
+            SceneDelegate.resetToWelcome()
             self?.navigationController?.navigationBar.isHidden = false
             print("go to main screen")
-
         }
     }
     
