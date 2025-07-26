@@ -53,9 +53,9 @@ final class GameBrain {
     var guaranteedPrize: Int = 0 //переменная для несгораемой суммы
     
     var hintButtons = [
-        ("50_50", true),
-        ("audience", true),
-        ("call", true)
+        ("50_50", true, true),
+        ("audience", true, true),
+        ("life", true, false)
     ]
     
     func refreshGame() {
@@ -71,4 +71,6 @@ final class GameBrain {
     var isGameInProgress : Bool = false
     
     var allTimeRecord : Int = 0
+    
+    var isMistakeAvialibale : Bool = true
 }

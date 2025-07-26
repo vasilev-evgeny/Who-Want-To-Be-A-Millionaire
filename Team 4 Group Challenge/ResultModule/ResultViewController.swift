@@ -98,7 +98,6 @@ class ResultViewController: BaseViewController {
         
         setupViews()
         setConstraints()
-        
     }
     
     func didUpdateQuestion(question: [QuestionModal]) {
@@ -121,6 +120,7 @@ class ResultViewController: BaseViewController {
         startNewGameButton.onTap = {
             self.startNewGameButton.buttonTappedAnimate()
             GameBrain.shared.isGameInProgress = true
+            GameBrain.shared.isMistakeAvialibale = true
             GameBrain.shared.refreshGame()
             let gameVC = GameViewController()
             self.navigationController?.pushViewController(gameVC, animated: true)
