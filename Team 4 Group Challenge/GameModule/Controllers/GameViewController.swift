@@ -230,7 +230,7 @@ class GameViewController: UIViewController {
         
         navigationItem.titleView = labelStack
         topTitleLabel.attributedText = attributedText(text: "QUESTION #\(game.currentQuestion + 1)", fontSize: 18, color: .white)
-        bottomTitleLabel.attributedText = attributedText(text: "$\(game.currentPrize)", fontSize: 19, color: .white)
+        bottomTitleLabel.attributedText = attributedText(text: "$\(game.questionsWorth[game.currentQuestion])", fontSize: 19, color: .white)
         
         //MARK: - Timer UI
         
@@ -346,12 +346,13 @@ class GameViewController: UIViewController {
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
             if isCorrectAnswer {
+                if self.game.currentPrize > UserDefaults.standard.integer(forKey: "allTimeRecord") {
+                    self.game.allTimeRecord = self.game.currentPrize
+                    UserDefaults.standard.set(self.game.allTimeRecord, forKey: "allTimeRecord")
+                }
                 SoundManager.shared.play(.correct)
                 sender.setBackgroundImage(UIImage(named: "right_answer"), for: .normal)
                 sender.blink()
-                if self.game.currentPrize > self.game.allTimeRecord {
-                    self.game.allTimeRecord = self.game.currentPrize
-                }
                 DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
                     self.game.guaranteedPrize =  (self.game.currentQuestion + 1) % 5 == 0 ? self.game.currentPrize : self.game.guaranteedPrize
                     self.awakeAnswerModule(isShowButton: true)
@@ -385,8 +386,9 @@ class GameViewController: UIViewController {
         /// добавляет в стэк навигации ResultViewController с результатом игры
         let currentQuestion = game.currentQuestion
         let money = game.currentPrize
-        let targetVC = ResultViewController(moneyWon: money , finalAnswerCount: currentQuestion)
+        let targetVC = ResultViewController(moneyWon: "\(money)" , finalAnswerCount: currentQuestion)
         SoundManager.shared.stopMusic()
+        GameBrain.shared.isGameInProgress = false
         navigationController?.pushViewController(targetVC, animated: true)
         targetVC.navigationController?.isNavigationBarHidden = true
 

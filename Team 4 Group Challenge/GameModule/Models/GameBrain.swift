@@ -10,107 +10,29 @@ final class GameBrain {
     
     static let shared = GameBrain()
     
-    var easy: [Question] = [
-        Question(
-            question: "Какой город называют 'Городом любви'?",
-            answers: ["Венеция", "Прага", "Париж", "Рим"],
-            correctAnswer: "Париж"
-        ),
-        Question(
-            question: "Где находится статуя Христа-Искупителя?",
-            answers: ["Буэнос-Айрес", "Рио-де-Жанейро", "Лима", "Сантьяго"],
-            correctAnswer: "Рио-де-Жанейро"
-        ),
-        Question(
-            question: "В каком городе находится Колизей?",
-            answers: ["Афины", "Стамбул", "Рим", "Каир"],
-            correctAnswer: "Рим"
-        ),
-        Question(
-            question: "Какой город построен на 118 островах?",
-            answers: ["Амстердам", "Стокгольм", "Венеция", "Копенгаген"],
-            correctAnswer: "Венеция"
-        ),
-        Question(
-            question: "Где находится Сиднейский оперный театр?",
-            answers: ["Мельбурн", "Окленд", "Сидней", "Брисбен"],
-            correctAnswer: "Сидней"
-        )
-    ]
+    var easy: [Question] = []
     
-    var medium: [Question] = [
-        Question(
-            question: "Какой город называют 'Большим яблоком'?",
-            answers: ["Чикаго", "Лос-Анджелес", "Нью-Йорк", "Торонто"],
-            correctAnswer: "Нью-Йорк"
-        ),
-        Question(
-            question: "Где находится древний город Петра?",
-            answers: ["Египет", "Иордания", "Сирия", "Ирак"],
-            correctAnswer: "Иордания"
-        ),
-        Question(
-            question: "Какой город является самым густонаселённым в мире?",
-            answers: ["Дели", "Шанхай", "Токио", "Сан-Паулу"],
-            correctAnswer: "Токио"
-        ),
-        Question(
-            question: "Где находится район Небесных мостов?",
-            answers: ["Сингапур", "Куала-Лумпур", "Дубай", "Гонконг"],
-            correctAnswer: "Сингапур"
-        ),
-        Question(
-            question: "Какой город называют 'Городом ветров'?",
-            answers: ["Чикаго", "Бостон", "Торонто", "Детройт"],
-            correctAnswer: "Чикаго"
-        )
-    ]
+    var medium: [Question] = []
     
-    var hard: [Question] = [
-        Question(
-            question: "Какой город является самым северным миллионником?",
-            answers: ["Осло", "Хельсинки", "Санкт-Петербург", "Стокгольм"],
-            correctAnswer: "Санкт-Петербург"
-        ),
-        Question(
-            question: "Где находится самая узкая улица (31 см)?",
-            answers: ["Прага", "Ротенбург-на-Таубере", "Венеция", "Амстердам"],
-            correctAnswer: "Ротенбург-на-Таубере"
-        ),
-        Question(
-            question: "Какой город построен на месте древнего озера?",
-            answers: ["Мехико", "Каир", "Дели", "Бангкок"],
-            correctAnswer: "Мехико"
-        ),
-        Question(
-            question: "Где находится самый длинный морской мост?",
-            answers: ["Китай", "Япония", "США", "ОАЭ"],
-            correctAnswer: "Китай"
-        ),
-        Question(
-            question: "Какой город имеет форму самолёта при виде сверху?",
-            answers: ["Бразилиа", "Канберра", "Астана", "Исламабад"],
-            correctAnswer: "Бразилиа"
-        )
-    ]
+    var hard: [Question] = []
     
-//    private let questionsWorth = [
-//        "500",
-//        "1,000",
-//        "2,000",
-//        "3,000",
-//        "5,000",
-//        "7,500",
-//        "10,000",
-//        "12,000",
-//        "15,000",
-//        "25,000",
-//        "50,000",
-//        "100,000",
-//        "250,000",
-//        "500,000",
-//        "1,000,000"
-//    ]
+     let questionsWorth = [
+        500,
+        1000,
+        2000,
+        3000,
+        5000,
+        7500,
+        10000,
+        12000,
+        15000,
+        25000,
+        50000,
+        100000,
+        250000,
+        500000,
+        1000000
+    ]
     
     private var newGameQuestion : [Question] {
         return easy + medium + hard
@@ -126,11 +48,11 @@ final class GameBrain {
     
     var isGameOver = false //переменная чтобы чекать, закончилась ли игра
     
-    var currentPrize: String {
-        return currentQuestion > 0 ? answers[15 - currentQuestion].questionPrice : "0"
+    var currentPrize: Int {
+        return currentQuestion > 0 ? answers[15 - currentQuestion].questionPrice : 0
     }  //переменная для текущего выигрыша
     
-    var guaranteedPrize: String = "0" //переменная для несгораемой суммы
+    var guaranteedPrize: Int = 0 //переменная для несгораемой суммы
     
     var isWalkAwayAvailable: Bool = true //переменная проверить, можно ли забрать деньги досрочно
     //TODO: - удалить если не нужны т.к. есть hintButtons
@@ -149,10 +71,10 @@ final class GameBrain {
         self.medium = medium.shuffled()
         self.hard = hard.shuffled()
         currentQuestion = 0
-        guaranteedPrize = "0"
-        helpButtonIsEnabled = true
-        audienceButtonIsEnabled = true
-        mistakeButtonIsEnabled = true
+        guaranteedPrize = 0
+        hintButtons[0].1 = true
+        hintButtons[1].1 = true
+        hintButtons[2].1 = true
     }
 //    func createQuestionArray() {
 //        if newGameQuestion.isEmpty {
@@ -166,5 +88,5 @@ final class GameBrain {
 //    }
     var isGameInProgress : Bool = false
     
-    var allTimeRecord : String = "0"
+    var allTimeRecord : Int = 0
 }

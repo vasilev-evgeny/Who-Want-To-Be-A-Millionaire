@@ -91,7 +91,7 @@ class AnswerViewController: BaseViewController {
         let currentQuestion = GameBrain.shared.currentQuestion
         let money = GameBrain.shared.currentPrize
         SoundManager.shared.stopMusic()
-        let resultVC = ResultViewController(moneyWon: money , finalAnswerCount: currentQuestion)
+        let resultVC = ResultViewController(moneyWon: "\(money)" , finalAnswerCount: currentQuestion)
         navigationController?.pushViewController(resultVC, animated: true)
     }
     private func continueButtonPressed(completition: (() -> Void)) {

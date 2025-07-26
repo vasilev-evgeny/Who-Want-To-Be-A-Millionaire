@@ -10,6 +10,8 @@ class WelcomeViewController: UIViewController {
         
     //MARK: - Create UI
     
+    let questionManager = QuestionManager()
+    
     //Buttons
     lazy var buttonRules: UIButton = {
         $0.translatesAutoresizingMaskIntoConstraints = false
@@ -22,6 +24,7 @@ class WelcomeViewController: UIViewController {
         $0.translatesAutoresizingMaskIntoConstraints = false
         $0.setTitle("New game", for: .normal)
         $0.setBackgroundImage(UIImage(named: "yellowBtn"), for: .normal)
+        //$0.setBackgroundImage(UIImage(named: "yellowBtn"), for: .disabled)  // если смущает, что при загрузки АПИ кнопка тускнеет, то можно подрубить, но тогда пользователь не поймет, что приложение сейчас грузится
         $0.titleLabel?.font = UIFont.boldSystemFont(ofSize: 24)
         $0.setTitleColor(.white, for: .normal)
         $0.addTarget(self, action: #selector(newGameButtonTapped), for: .touchUpInside)
@@ -90,7 +93,6 @@ class WelcomeViewController: UIViewController {
     
     let allTimeCashLabel : UILabel = {
         let label = UILabel()
-        label.text = "$\(GameBrain.shared.allTimeRecord)"
         label.font = UIFont.systemFont(ofSize: 24, weight: .semibold)
         label.textColor = UIColor.white
         label.textAlignment = .center
@@ -132,6 +134,7 @@ class WelcomeViewController: UIViewController {
         let gameVC = GameViewController()
         self.navigationController?.pushViewController(gameVC, animated: true)
     }
+
     
     func checkGameStatus() {
         switch GameBrain.shared.isGameInProgress {
@@ -143,6 +146,43 @@ class WelcomeViewController: UIViewController {
         }
     }
     
+    func checkRecord() {
+        if UserDefaults.standard.string(forKey: "allTimeRecord") == nil {
+            allTimeCashLabel.text = "$0"
+        } else {
+            //print(UserDefaults.standard.string(forKey: "allTimeRecord")!)
+            allTimeCashLabel.text = "$ \(UserDefaults.standard.integer(forKey: "allTimeRecord"))"
+        }
+    }
+    
+    func preloadQuestions() {
+        buttonNewGame.isEnabled = false
+        
+        questionManager.fetchQuestions("easy") { questions in
+            DispatchQueue.main.async {
+                GameBrain.shared.easy = questions
+                
+                self.buttonNewGame.isEnabled = true
+            }
+        }
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
+            self.questionManager.fetchQuestions("medium") { questions in
+                DispatchQueue.main.async {
+                    GameBrain.shared.medium = questions
+                }
+            }
+        }
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 10) {
+            self.questionManager.fetchQuestions("hard") { questions in
+                DispatchQueue.main.async {
+                    GameBrain.shared.hard = questions
+                }
+            }
+        }
+    }
+    
     //MARK: - Lifecycle
     
     override func viewDidLoad() {
@@ -150,6 +190,17 @@ class WelcomeViewController: UIViewController {
         setupViews()
         setConstraints()
         checkGameStatus()
+        checkRecord()
+        preloadQuestions()
+        
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        checkGameStatus()
+        checkRecord()
+        navigationController?.setNavigationBarHidden(false, animated: animated)
+        self.navigationItem.hidesBackButton = true
     }
     
     private func setupViews() {

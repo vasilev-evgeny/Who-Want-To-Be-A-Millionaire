@@ -24,7 +24,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let answerVC = AnswerViewController(answers: answers)
         let splashVC = SplashViewController()
         let gameVC = GameViewController()
-        let navController = UINavigationController(rootViewController: gameVC)
+        let navController = UINavigationController(rootViewController: splashVC)
 
         window.rootViewController = navController
         navController.setNavigationBarHidden(true, animated: false)
@@ -60,5 +60,21 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     }
 
 
+}
+
+extension SceneDelegate {
+    static func resetToWelcome() {
+        guard let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+              let sceneDelegate = scene.delegate as? SceneDelegate else {
+            return
+        }
+
+        let welcomeVC = WelcomeViewController()
+        let nav = UINavigationController(rootViewController: welcomeVC)
+        nav.setNavigationBarHidden(true, animated: false)
+
+        sceneDelegate.window?.rootViewController = nav
+        sceneDelegate.window?.makeKeyAndVisible()
+    }
 }
 
