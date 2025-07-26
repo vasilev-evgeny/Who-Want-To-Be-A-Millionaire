@@ -7,8 +7,6 @@
 import UIKit
 
 class GameViewController: UIViewController {
-    enum Constants {
-    }
     
     let game = GameBrain.shared
     
@@ -130,6 +128,8 @@ class GameViewController: UIViewController {
         answersStack.translatesAutoresizingMaskIntoConstraints = false
         return answersStack
     }()
+    
+    var answerButtonsTitles = [String]()
     
     var answersButtonArray = [UIButton]()
     
@@ -282,7 +282,7 @@ class GameViewController: UIViewController {
             answersStack.trailingAnchor.constraint(equalTo: mainView.trailingAnchor, constant: -32),
             answersStack.heightAnchor.constraint(equalToConstant: 272)
         ])
-        let answerButtonsTitles = game.sharedGameQuestions[game.currentQuestion].answers.shuffled()
+        answerButtonsTitles = game.sharedGameQuestions[game.currentQuestion].answers.shuffled()
         
         for (key, value) in answerButtonsTitles.enumerated() {
             answersButtonArray.append(createAnswerButton(letter: key, title: value))
@@ -323,6 +323,7 @@ class GameViewController: UIViewController {
     @objc func pushBackButton(sender: UIButton) {
         sender.buttonTappedAnimate()
         SoundManager.shared.stopMusic()
+        CountdownTimer.shared.stopTimer()
         let targetVC = WelcomeViewController()
         self.navigationController?.pushViewController(targetVC, animated: true)
         targetVC.navigationItem.hidesBackButton = true
@@ -472,10 +473,11 @@ class GameViewController: UIViewController {
     }
     ///Выбирает выдает верный ответ с заданной вероятностью
     private func useAudience(_ sender: UIButton) {
-        let arrAnswers = getAvailableAnswerOption(winrate: 70)
-        guard let audienceAnswer = arrAnswers.shuffled().randomElement() else { return }
-        
-        let audienceVC = AudienceViewController(audienceAnswer: audienceAnswer)
+
+        let winrate = game.currentQuestion < 10 ? 70 : 50
+        let audienceElection =  audienceElection(correctAnswer: game.sharedGameQuestions[game.currentQuestion].correctAnswer, answers: answerButtonsTitles, currentAnswerWinRate: winrate)
+                             
+        let audienceVC = AudienceViewController(audienceAnswer: audienceElection)
         audienceVC.modalPresentationStyle = .popover
         audienceVC.preferredContentSize = CGSize(width: 200, height: 200)
         audienceVC.popoverPresentationController?.sourceView = sender
@@ -488,7 +490,7 @@ class GameViewController: UIViewController {
         let arrAnswers = getAvailableAnswerOption(winrate: 50)
         guard let audienceAnswer = arrAnswers.shuffled().randomElement() else { return }
         
-        let audienceVC = AudienceViewController(audienceAnswer: audienceAnswer)
+        let audienceVC = CallFriendViewController(audienceAnswer: audienceAnswer)
         audienceVC.modalPresentationStyle = .popover
         audienceVC.preferredContentSize = CGSize(width: 200, height: 200)
         audienceVC.popoverPresentationController?.sourceView = sender
@@ -525,7 +527,45 @@ class GameViewController: UIViewController {
         }
         
         return arrAnswers
+        
     }
+    /// Формируем массив с результатами зретильского голосования с заданным процентов выбора верного ответа
+    private func audienceElection(correctAnswer: String, answers: [String], currentAnswerWinRate: Int) -> [CGFloat] {
+        
+        let wrongAnswers = answers.filter { $0 != correctAnswer }
+        
+        var result = [Int]()
+        
+        let aAnswer = currentAnswerWinRate
+        let bAnswer = Int.random(in: 0...(100 - aAnswer))
+        let cAnswer = Int.random(in: 0...(100 - aAnswer - bAnswer))
+        let dAnswer = 100 - aAnswer - bAnswer - cAnswer
+        
+        let ansA = Array(repeating: correctAnswer, count: aAnswer)
+        let ansB = Array(repeating: wrongAnswers[0], count: bAnswer)
+        let ansC = Array(repeating: wrongAnswers[1], count: cAnswer)
+        let ansD = Array(repeating: wrongAnswers[2], count: dAnswer)
+
+        let sum = (ansA + ansB + ansC + ansD).shuffled()
+
+        let countA = sum[0...aAnswer - 1].filter { $0 == correctAnswer }.count
+        let countB = sum[0...aAnswer - 1].filter { $0 == wrongAnswers[0] }.count
+        let countC = sum[0...aAnswer - 1].filter { $0 == wrongAnswers[1] }.count
+        let countD = sum[0...aAnswer - 1].filter { $0 == wrongAnswers[2] }.count
+        
+        for value in answers {
+            switch value {
+            case correctAnswer: result.append(countA)
+            case wrongAnswers[0]: result.append(countB)
+            case wrongAnswers[1]: result.append(countC)
+            case wrongAnswers[2]: result.append(countD)
+            default: break
+            }
+        }
+        
+        return result.map { CGFloat($0) }
+    }
+
     /// Просматривает доступные варианты ответов и формирует массив из доступных ложных
     private func getAvailableAnswerOption (winrate: Int) -> [String] {
         let correctAnswer = game.sharedGameQuestions[game.currentQuestion].correctAnswer

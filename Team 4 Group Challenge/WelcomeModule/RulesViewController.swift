@@ -10,34 +10,43 @@ import UIKit
 class RulesViewController: UIViewController {
     
     let rulesTextIntroBlock = """
-        Who wants to become a millionaire?
+        Who wants to be a millionaire?
                 
         An intellectual game with questions and a choice of answers. 
         
         The goal of the game is to reach the sum of one million dollars.
-        To achieve this goal, the player must correctly answer 15 questions.
-        questions from various fields of knowledge. The time for reflection is limited to 30 seconds. The difficulty of the game increases with each new question.
+        
+        To achieve this goal, the player must correctly answer 15 questions \
+        from various fields of knowledge. The time for thinking is limited to 
+        30 seconds. The difficulty of the game increases with each new question.
 
         The questions have four possible answers, of which only one is correct. 
-        Each question has a specific cost that cannot be combined with 
-        the previous one, but is replaced with a new one if the answer is correct.
+        
+        Each question has a specific cost that cannot be combined with the \
+        previous one, but is replaced with a new one if the answer is correct.
         """
     let rulesTextCurrentLevelBlock = """
-        You can view the current level by clicking on the button in the upper-right corner of the screen.
-    """
+        You can view the current level by clicking on the button in the \
+        upper-right corner of the screen.
+        """
     let rulesTextSafeAmountBlock = """
-        There are two fireproof amounts. When this amount is reached, the player's score will not drop below in case of a draw or if the player wants to stop the game. 
-    
+        There are two guaranteed amounts. When this amount is reached, the \
+        player's score will not drop below in case of an incorrect answer, \
+        expiration of 30 seconds, or if the player wants to stop the game. 
+        
         There are 3 hints available to the player:
-    """
+        """
     
     let rulesTextHintsBlock = """
-        50/50 - removes 2 incorrect options and leaves one correct and one incorrect 
-        The help of the hall - the player can use the answer offered by the hall
+        50/50 - removes 2 incorrect answers and leaves one correct and one incorrect 
+        
+        Ask the Audience - the player can use the answer offered by the hall
                 
-        Call a friend - the player can call a friend and consult with him within 30 seconds.
+        Phone a Friend - the player will be offered an option with a high \
+        probability of a correct answer
 
-        The game ends if the player answers 15 questions correctly or after the first mistake.
+        The game ends if the player answers 15 questions correctly, after the \
+        first mistake or runs out of 30 seconds. 
         """
     
     
@@ -83,6 +92,8 @@ class RulesViewController: UIViewController {
         let element = UIImageView()
         element.image = UIImage(named: "LevelRules")
         element.contentMode = .scaleAspectFit
+        element.layer.cornerRadius = 20
+        element.clipsToBounds = true
         element.translatesAutoresizingMaskIntoConstraints = false
         return element
     }()
@@ -100,6 +111,8 @@ class RulesViewController: UIViewController {
     private lazy var levelsButtonImageView: UIImageView = {
         let element = UIImageView()
         element.image = UIImage(named: "Levels button")
+        element.layer.cornerRadius = 20
+        element.clipsToBounds = true
         element.translatesAutoresizingMaskIntoConstraints = false
         return element
     }()
@@ -118,6 +131,8 @@ class RulesViewController: UIViewController {
     private lazy var hintsButtonImageView: UIImageView = {
         let element = UIImageView()
         element.image = UIImage(named: "Hints")
+        element.layer.cornerRadius = 20
+        element.clipsToBounds = true
         element.translatesAutoresizingMaskIntoConstraints = false
         return element
     }()
