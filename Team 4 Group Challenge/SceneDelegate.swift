@@ -71,7 +71,7 @@ extension SceneDelegate {
 
         let welcomeVC = WelcomeViewController()
         let nav = UINavigationController(rootViewController: welcomeVC)
-        nav.setNavigationBarHidden(true, animated: false)
+        nav.setNavigationBarHidden(true, animated: true)
 
         sceneDelegate.window?.rootViewController = nav
         sceneDelegate.window?.makeKeyAndVisible()
