@@ -79,6 +79,7 @@ extension SceneDelegate {
         }
         
         window.window?.makeKeyAndVisible()
+
     }
 }
 
