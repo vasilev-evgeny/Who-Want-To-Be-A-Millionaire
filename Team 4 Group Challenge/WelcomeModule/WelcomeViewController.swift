@@ -123,6 +123,10 @@ class WelcomeViewController: UIViewController {
     
     @objc func continueButtonTapped(sender : UIButton) {
         sender.buttonTappedAnimate()
+        guard !GameBrain.shared.sharedGameQuestions.isEmpty else {
+                print("вопросы не загрузились")
+                return
+            }
         let gameVC = GameViewController()
         self.navigationController?.pushViewController(gameVC, animated: true)
     }
@@ -150,18 +154,17 @@ class WelcomeViewController: UIViewController {
         if UserDefaults.standard.string(forKey: "allTimeRecord") == nil {
             allTimeCashLabel.text = "$0"
         } else {
-            //print(UserDefaults.standard.string(forKey: "allTimeRecord")!)
             allTimeCashLabel.text = "$ \(UserDefaults.standard.integer(forKey: "allTimeRecord"))"
         }
     }
     
     func preloadQuestions() {
         buttonNewGame.isEnabled = false
-        
+        buttonContinueGame.isEnabled = false
         questionManager.fetchQuestions("easy") { questions in
             DispatchQueue.main.async {
                 GameBrain.shared.easy = questions
-                
+                self.buttonContinueGame.isEnabled = true
                 self.buttonNewGame.isEnabled = true
             }
         }

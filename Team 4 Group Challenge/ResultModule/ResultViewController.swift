@@ -137,6 +137,7 @@ class ResultViewController: BaseViewController {
             self?.navigationController?.navigationBar.isHidden = false
             print("go to main screen")
         }
+        
     }
     
     //MARK: - setConstraints
