@@ -144,6 +144,9 @@ class GameViewController: UIViewController {
         button.contentHorizontalAlignment = .left
         button.addTarget(self, action: #selector(answerButtonPressed), for: .touchUpInside)
         button.translatesAutoresizingMaskIntoConstraints = false
+        button.titleLabel?.lineBreakMode = .byTruncatingTail
+        button.titleLabel?.numberOfLines = 1
+        button.contentEdgeInsets = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 20)
         return button
     }
     
@@ -269,6 +272,7 @@ class GameViewController: UIViewController {
             questionTextView.heightAnchor.constraint(equalToConstant: 147)
         ])
         questionTextView.attributedText = attributedText(text: game.sharedGameQuestions[game.currentQuestion].question, fontSize: 24, color: .white)
+        print(game.sharedGameQuestions[game.currentQuestion].correctAnswer)
         
         //MARK: - Answers Section UI
         mainView.addSubview(answersStack)
@@ -339,8 +343,10 @@ class GameViewController: UIViewController {
         CountdownTimer.shared.stopTimer()
         sender.setBackgroundImage(UIImage(named: "YellowButton"), for: .normal)
         hintButtons.forEach { $0.isEnabled = false }
-        
+        answersStack.arrangedSubviews.forEach {$0.isUserInteractionEnabled = false}
         guard let title = sender.currentAttributedTitle?.string else { return }
+
+        
         let isCorrectAnswer = title.hasSuffix(game.sharedGameQuestions[game.currentQuestion].correctAnswer)
         DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
             if isCorrectAnswer {
@@ -366,6 +372,7 @@ class GameViewController: UIViewController {
                         UserDefaults.standard.set(self.game.allTimeRecord, forKey: "allTimeRecord")
                         self.game.currentQuestion += 1
                         self.gameOver()
+                        SoundManager.shared.play(.million)
                     } else {
                         self.awakeAnswerModule(isShowButton: true)
                         self.game.currentQuestion += 1

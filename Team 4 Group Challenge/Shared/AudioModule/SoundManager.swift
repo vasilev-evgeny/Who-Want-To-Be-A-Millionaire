@@ -19,6 +19,7 @@ final class SoundManager {
         case correct = "correct_answer"
         case wrong = "wrong_answer"
         case suspense = "suspence_music"
+        case million = "million_sound"
     }
     
     func play(_ soundType: SoundType) {
