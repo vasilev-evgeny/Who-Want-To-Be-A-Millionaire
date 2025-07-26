@@ -81,5 +81,24 @@ extension SceneDelegate {
         window.window?.makeKeyAndVisible()
 
     }
+    
+    static func resetToWNewGame() {
+        guard let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+              let sceneDelegate = scene.delegate as? SceneDelegate,
+              let window = sceneDelegate.window else {
+            return
+        }
+
+        let gameVC = GameViewController()
+        let nav = UINavigationController(rootViewController: gameVC)
+        nav.setNavigationBarHidden(false, animated: false)
+        
+        UIView.transition(with: window, duration: 0.5, options: .transitionFlipFromLeft) {
+            window.rootViewController = nav
+        }
+        
+        window.window?.makeKeyAndVisible()
+
+    }
 }
 

@@ -127,8 +127,9 @@ class ResultViewController: BaseViewController {
             GameBrain.shared.isMistakeAvialibale = true
             GameBrain.shared.refreshGame()
             let gameVC = GameViewController()
-            gameVC.navigationController?.navigationBar.isHidden = false
-            self.navigationController?.pushViewController(gameVC, animated: true)
+            SceneDelegate.resetToWNewGame()
+            self.navigationController?.navigationBar.isHidden = false
+//            self.navigationController?.pushViewController(gameVC, animated: true)
         }
         
         goToMainScreenButton.titleText = "Main screen"
