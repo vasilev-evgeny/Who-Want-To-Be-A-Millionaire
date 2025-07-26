@@ -65,16 +65,20 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 extension SceneDelegate {
     static func resetToWelcome() {
         guard let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-              let sceneDelegate = scene.delegate as? SceneDelegate else {
+              let sceneDelegate = scene.delegate as? SceneDelegate,
+              let window = sceneDelegate.window else {
             return
         }
 
         let welcomeVC = WelcomeViewController()
         let nav = UINavigationController(rootViewController: welcomeVC)
         nav.setNavigationBarHidden(true, animated: false)
-
-        sceneDelegate.window?.rootViewController = nav
-        sceneDelegate.window?.makeKeyAndVisible()
+        
+        UIView.transition(with: window, duration: 0.5, options: .transitionFlipFromLeft) {
+            window.rootViewController = nav
+        }
+        
+        window.window?.makeKeyAndVisible()
     }
 }
 
