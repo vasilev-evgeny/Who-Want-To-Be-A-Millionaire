@@ -25,10 +25,8 @@ class AudienceHint: UIView {
         let sortedIndices = barValues.enumerated()
             .sorted { $0.element > $1.element }
             .map { $0.offset }
-
-        // Shuffle for bar display
+        
         var displayIndices = Array(barValues.indices)
-        displayIndices.shuffle()
 
         let labelColor = UIColor(red: 225/255, green: 155/255, blue: 48/255, alpha: 1)
         

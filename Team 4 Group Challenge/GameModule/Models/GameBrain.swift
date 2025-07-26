@@ -104,8 +104,6 @@ final class GameBrain {
     var answers = Answer.getAnswerList()
     var currentQuestion = 0 // номер текущего вопроса, +1 к нему делаем когда кнопку НАЗАД нажимает на AnswerVC,его же можно привязать к indexPath в UITableViewCell, чтобы красить нужную по порядковому номеру ячейку
     
-//    var isAnswerCorrect = true // переменная чтобы проверять правильно ли ответил юзер или нет
-    
     var isGameOver = false //переменная чтобы чекать, закончилась ли игра
     
     var currentPrize: String {
@@ -114,12 +112,6 @@ final class GameBrain {
     
     var guaranteedPrize: String = "0" //переменная для несгораемой суммы
     
-    var isWalkAwayAvailable: Bool = true //переменная проверить, можно ли забрать деньги досрочно
-    //TODO: - удалить если не нужны т.к. есть hintButtons
-    var helpButtonIsEnabled = true //cостояние кнопок подсказок
-    var audienceButtonIsEnabled = true //cостояние кнопок подсказок
-    var mistakeButtonIsEnabled = true //cостояние кнопок подсказок
-    
     var hintButtons = [
         ("50_50", true),
         ("audience", true),
@@ -127,23 +119,9 @@ final class GameBrain {
     ]
     
     func refreshGame() {
-//        self.easy = easy.shuffled()
-//        self.medium = medium.shuffled()
-//        self.hard = hard.shuffled()
-//        currentQuestion = 0
-//        guaranteedPrize = "0"
         GameBrain.shared = GameBrain()
     }
-//    func createQuestionArray() {
-//        if newGameQuestion.isEmpty {
-//            easy.shuffle()
-//            medium.shuffle()
-//            hard.shuffle()
-//            newGameQuestion.append(contentsOf: easy)
-//            newGameQuestion.append(contentsOf: medium)
-//            newGameQuestion.append(contentsOf: hard)
-//        }
-//    }
+
     var isGameInProgress : Bool = false
     
     var allTimeRecord : String = "0"

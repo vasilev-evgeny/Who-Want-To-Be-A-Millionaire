@@ -129,9 +129,7 @@ class GameViewController: UIViewController {
         return answersStack
     }()
     
-    var answerButtonsTitles : [String] {
-        return game.sharedGameQuestions[game.currentQuestion].answers.shuffled()
-    }
+    var answerButtonsTitles = [String]()
     
     var answersButtonArray = [UIButton]()
     
@@ -280,7 +278,7 @@ class GameViewController: UIViewController {
             answersStack.trailingAnchor.constraint(equalTo: mainView.trailingAnchor, constant: -32),
             answersStack.heightAnchor.constraint(equalToConstant: 272)
         ])
-//        let answerButtonsTitles = game.sharedGameQuestions[game.currentQuestion].answers.shuffled()
+        answerButtonsTitles = game.sharedGameQuestions[game.currentQuestion].answers.shuffled()
         
         for (key, value) in answerButtonsTitles.enumerated() {
             answersButtonArray.append(createAnswerButton(letter: key, title: value))
@@ -518,13 +516,13 @@ class GameViewController: UIViewController {
         
         let wrongAnswers = answers.filter { $0 != correctAnswer }
         
+        var result = [Int]()
+        
         let aAnswer = currentAnswerWinRate
-        let bAnswer = Int.random(in: 1...(100 - aAnswer))
-        let cAnswer = Int.random(in: 1...(100 - aAnswer - bAnswer))
+        let bAnswer = Int.random(in: 0...(100 - aAnswer))
+        let cAnswer = Int.random(in: 0...(100 - aAnswer - bAnswer))
         let dAnswer = 100 - aAnswer - bAnswer - cAnswer
-
-
-
+        
         let ansA = Array(repeating: correctAnswer, count: aAnswer)
         let ansB = Array(repeating: wrongAnswers[0], count: bAnswer)
         let ansC = Array(repeating: wrongAnswers[1], count: cAnswer)
@@ -537,7 +535,17 @@ class GameViewController: UIViewController {
         let countC = sum[0...aAnswer - 1].filter { $0 == wrongAnswers[1] }.count
         let countD = sum[0...aAnswer - 1].filter { $0 == wrongAnswers[2] }.count
         
-        return [countA, countB, countC, countD].map { CGFloat($0) }
+        for value in answers {
+            switch value {
+            case correctAnswer: result.append(countA)
+            case wrongAnswers[0]: result.append(countB)
+            case wrongAnswers[1]: result.append(countC)
+            case wrongAnswers[2]: result.append(countD)
+            default: break
+            }
+        }
+        
+        return result.map { CGFloat($0) }
     }
 
     /// Просматривает доступные варианты ответов и формирует массив из доступных ложных
