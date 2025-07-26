@@ -157,11 +157,11 @@ class WelcomeViewController: UIViewController {
     
     func preloadQuestions() {
         buttonNewGame.isEnabled = false
-        
+        buttonContinueGame.isEnabled = false
         questionManager.fetchQuestions("easy") { questions in
             DispatchQueue.main.async {
                 GameBrain.shared.easy = questions
-                
+                self.buttonContinueGame.isEnabled = true
                 self.buttonNewGame.isEnabled = true
             }
         }

@@ -269,6 +269,7 @@ class GameViewController: UIViewController {
             questionTextView.heightAnchor.constraint(equalToConstant: 147)
         ])
         questionTextView.attributedText = attributedText(text: game.sharedGameQuestions[game.currentQuestion].question, fontSize: 24, color: .white)
+        print(game.sharedGameQuestions[game.currentQuestion].correctAnswer)
         
         //MARK: - Answers Section UI
         mainView.addSubview(answersStack)
@@ -358,6 +359,7 @@ class GameViewController: UIViewController {
                     self.awakeAnswerModule(isShowButton: true)
                     if self.game.currentQuestion == (self.game.sharedGameQuestions.count - 1) {
                         self.gameOver()
+                        SoundManager.shared.play(.million)
                     } else {
                         self.game.currentQuestion += 1
                         self.clearStack(for: &self.answersStack)
