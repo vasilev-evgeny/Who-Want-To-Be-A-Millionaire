@@ -8,7 +8,7 @@ import UIKit
 
 final class GameBrain {
     
-    static let shared = GameBrain()
+    static var shared = GameBrain()
     
     var easy: [Question] = [
         Question(
@@ -36,7 +36,7 @@ final class GameBrain {
             answers: ["Мельбурн", "Окленд", "Сидней", "Брисбен"],
             correctAnswer: "Сидней"
         )
-    ]
+    ].shuffled()
     
     var medium: [Question] = [
         Question(
@@ -64,7 +64,7 @@ final class GameBrain {
             answers: ["Чикаго", "Бостон", "Торонто", "Детройт"],
             correctAnswer: "Чикаго"
         )
-    ]
+    ].shuffled()
     
     var hard: [Question] = [
         Question(
@@ -92,25 +92,7 @@ final class GameBrain {
             answers: ["Бразилиа", "Канберра", "Астана", "Исламабад"],
             correctAnswer: "Бразилиа"
         )
-    ]
-    
-//    private let questionsWorth = [
-//        "500",
-//        "1,000",
-//        "2,000",
-//        "3,000",
-//        "5,000",
-//        "7,500",
-//        "10,000",
-//        "12,000",
-//        "15,000",
-//        "25,000",
-//        "50,000",
-//        "100,000",
-//        "250,000",
-//        "500,000",
-//        "1,000,000"
-//    ]
+    ].shuffled()
     
     private var newGameQuestion : [Question] {
         return easy + medium + hard
@@ -127,7 +109,7 @@ final class GameBrain {
     var isGameOver = false //переменная чтобы чекать, закончилась ли игра
     
     var currentPrize: String {
-        return currentQuestion > 0 ? answers[15 - currentQuestion].questionPrice : "0"
+        return answers[14 - currentQuestion].questionPrice
     }  //переменная для текущего выигрыша
     
     var guaranteedPrize: String = "0" //переменная для несгораемой суммы
@@ -145,14 +127,12 @@ final class GameBrain {
     ]
     
     func refreshGame() {
-        self.easy = easy.shuffled()
-        self.medium = medium.shuffled()
-        self.hard = hard.shuffled()
-        currentQuestion = 0
-        guaranteedPrize = "0"
-        helpButtonIsEnabled = true
-        audienceButtonIsEnabled = true
-        mistakeButtonIsEnabled = true
+//        self.easy = easy.shuffled()
+//        self.medium = medium.shuffled()
+//        self.hard = hard.shuffled()
+//        currentQuestion = 0
+//        guaranteedPrize = "0"
+        GameBrain.shared = GameBrain()
     }
 //    func createQuestionArray() {
 //        if newGameQuestion.isEmpty {
