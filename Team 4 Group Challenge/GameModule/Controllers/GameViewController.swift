@@ -323,6 +323,7 @@ class GameViewController: UIViewController {
     @objc func pushBackButton(sender: UIButton) {
         sender.buttonTappedAnimate()
         SoundManager.shared.stopMusic()
+        CountdownTimer.shared.stopTimer()
         let targetVC = WelcomeViewController()
         self.navigationController?.pushViewController(targetVC, animated: true)
         targetVC.navigationItem.hidesBackButton = true
