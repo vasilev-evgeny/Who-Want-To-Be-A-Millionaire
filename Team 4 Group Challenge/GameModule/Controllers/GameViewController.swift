@@ -342,13 +342,12 @@ class GameViewController: UIViewController {
         SoundManager.shared.play(.suspense)
         CountdownTimer.shared.stopTimer()
         sender.setBackgroundImage(UIImage(named: "YellowButton"), for: .normal)
-        /// не дает нажать на кнопку после выбора варианта
         hintButtons.forEach { $0.isEnabled = false }
         answersStack.arrangedSubviews.forEach {$0.isUserInteractionEnabled = false}
         guard let title = sender.currentAttributedTitle?.string else { return }
+
         
         let isCorrectAnswer = title.hasSuffix(game.sharedGameQuestions[game.currentQuestion].correctAnswer)
-        
         DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
             if isCorrectAnswer {
                 if self.game.currentPrize > UserDefaults.standard.integer(forKey: "allTimeRecord") {
@@ -359,12 +358,23 @@ class GameViewController: UIViewController {
                 sender.setBackgroundImage(UIImage(named: "right_answer"), for: .normal)
                 sender.blink()
                 DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
-                    self.game.guaranteedPrize =  (self.game.currentQuestion + 1) % 5 == 0 ? self.game.currentPrize : self.game.guaranteedPrize
-                    self.awakeAnswerModule(isShowButton: true)
+                    /// обновляет guaranteedPrize после верного ответа если это была несгораемая сумма
+                    let currentQuestion = self.game.currentQuestion
+                    switch currentQuestion {
+                    case 14, 9, 4:
+                        self.game.guaranteedPrize = self.game.answers[14 - currentQuestion].questionPrice
+                    default:
+                        break
+                    }
                     if self.game.currentQuestion == (self.game.sharedGameQuestions.count - 1) {
+                        ///Обновляет кол-вол верных ответов
+                        self.game.allTimeRecord = self.game.answers[0].questionPrice
+                        UserDefaults.standard.set(self.game.allTimeRecord, forKey: "allTimeRecord")
+                        self.game.currentQuestion += 1
                         self.gameOver()
                         SoundManager.shared.play(.million)
                     } else {
+                        self.awakeAnswerModule(isShowButton: true)
                         self.game.currentQuestion += 1
                         self.clearStack(for: &self.answersStack)
                         
@@ -372,6 +382,7 @@ class GameViewController: UIViewController {
                         self.answersButtonArray = []
                         self.hintButtons = []
                         self.setupUI()
+                        print(self.game.sharedGameQuestions[self.game.currentQuestion].correctAnswer)
                     }
                 }
             }
@@ -391,15 +402,13 @@ class GameViewController: UIViewController {
     func gameOver() {
         /// добавляет в стэк навигации ResultViewController с результатом игры
         let currentQuestion = game.currentQuestion
-        let money = game.currentPrize
+        let money = game.guaranteedPrize
         let targetVC = ResultViewController(moneyWon: "\(money)" , finalAnswerCount: currentQuestion)
         SoundManager.shared.stopMusic()
         GameBrain.shared.isGameInProgress = false
         navigationController?.pushViewController(targetVC, animated: true)
         targetVC.navigationController?.isNavigationBarHidden = true
-
     }
-    
     func clearStack(for stack: inout UIStackView) {
         for subview in stack.arrangedSubviews {
             stack.removeArrangedSubview(subview)
@@ -412,7 +421,7 @@ class GameViewController: UIViewController {
         let current = 14 - GameBrain.shared.currentQuestion
         if !isShowButton {
             switch current {
-            case 0...5:
+            case 0..<5:
                 answers[5].isCurrent = true
             case ..<10:
                 answers[10].isCurrent = true
@@ -468,7 +477,7 @@ class GameViewController: UIViewController {
         
         let audienceVC = AudienceViewController(audienceAnswer: audienceAnswer)
         audienceVC.modalPresentationStyle = .popover
-        audienceVC.preferredContentSize = CGSize(width: 300, height: 280)
+        audienceVC.preferredContentSize = CGSize(width: 200, height: 200)
         audienceVC.popoverPresentationController?.sourceView = sender
         audienceVC.popoverPresentationController?.delegate = self
         present(audienceVC, animated: true)
@@ -481,7 +490,7 @@ class GameViewController: UIViewController {
         
         let audienceVC = AudienceViewController(audienceAnswer: audienceAnswer)
         audienceVC.modalPresentationStyle = .popover
-        audienceVC.preferredContentSize = CGSize(width: 300, height: 280)
+        audienceVC.preferredContentSize = CGSize(width: 200, height: 200)
         audienceVC.popoverPresentationController?.sourceView = sender
         audienceVC.popoverPresentationController?.delegate = self
         present(audienceVC, animated: true)
