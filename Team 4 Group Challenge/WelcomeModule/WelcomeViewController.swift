@@ -195,6 +195,14 @@ class WelcomeViewController: UIViewController {
         
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        checkGameStatus()
+        checkRecord()
+        navigationController?.setNavigationBarHidden(false, animated: animated)
+        self.navigationItem.hidesBackButton = true
+    }
+    
     private func setupViews() {
         view.backgroundColor = .systemPink
         view.addSubview(bgImage)

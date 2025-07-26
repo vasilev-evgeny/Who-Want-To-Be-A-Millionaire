@@ -388,6 +388,7 @@ class GameViewController: UIViewController {
         let money = game.currentPrize
         let targetVC = ResultViewController(moneyWon: "\(money)" , finalAnswerCount: currentQuestion)
         SoundManager.shared.stopMusic()
+        GameBrain.shared.isGameInProgress = false
         navigationController?.pushViewController(targetVC, animated: true)
         targetVC.navigationController?.isNavigationBarHidden = true
 

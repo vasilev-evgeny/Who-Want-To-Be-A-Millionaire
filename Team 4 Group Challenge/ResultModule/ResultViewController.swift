@@ -131,7 +131,7 @@ class ResultViewController: BaseViewController {
         goToMainScreenButton.onTap = { [weak self] in
             /// удаляет из стэка все контроллеры до рутового
             //TODO: - обнулить данные о предыдущей игре
-            
+            GameBrain.shared.isGameInProgress = false
             //self?.navigationController?.popToRootViewController(animated: true)
             SceneDelegate.resetToWelcome()
             self?.navigationController?.navigationBar.isHidden = false
