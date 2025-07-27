@@ -42,8 +42,8 @@ class RulesViewController: UIViewController {
         
         Ask the Audience - the player can use the answer offered by the hall
                 
-        Phone a Friend - the player will be offered an option with a high \
-        probability of a correct answer
+        Right to make a mistake -  if the player chooses the wrong answer, he \
+        will have the opportunity to do it again
 
         The game ends if the player answers 15 questions correctly, after the \
         first mistake or runs out of 30 seconds. 
