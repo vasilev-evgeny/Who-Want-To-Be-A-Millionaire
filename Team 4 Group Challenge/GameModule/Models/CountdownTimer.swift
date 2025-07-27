@@ -19,7 +19,7 @@ final class CountdownTimer {
         stopTimer()
         gameVC = viewController
         secondsRemaining = 30
-        gameVC?.timerView.layer.backgroundColor = UIColor.regularTimerView?.cgColor
+        gameVC?.timerView.layer.backgroundColor = UIColor.regularTimerView.cgColor
         gameVC?.timerImage.tintColor = UIColor.regularTimer
         gameVC?.timerCounter.textColor = UIColor.regularTimerCounter
         
@@ -39,7 +39,7 @@ final class CountdownTimer {
         if secondsRemaining == 15 {
             gameVC?.timerCounter.pulse()
             UIView.animate(withDuration: 0.4) {
-                self.gameVC?.timerView.layer.backgroundColor = UIColor.warningTimerView?.cgColor
+                self.gameVC?.timerView.layer.backgroundColor = UIColor.warningTimerView.cgColor
                 self.gameVC?.timerImage.tintColor = UIColor.warningTimer
                 self.gameVC?.timerCounter.textColor = UIColor.warningTimerCounter
             }
@@ -47,7 +47,7 @@ final class CountdownTimer {
         } else if secondsRemaining == 5 {
             gameVC?.timerCounter.pulse()
             UIView.animate(withDuration: 0.4) {
-                self.gameVC?.timerView.layer.backgroundColor = UIColor.alertTimerView?.cgColor
+                self.gameVC?.timerView.layer.backgroundColor = UIColor.alertTimerView.cgColor
                 self.gameVC?.timerImage.tintColor = UIColor.alertTimer
                 self.gameVC?.timerCounter.textColor = UIColor.alertTimerCounter
             }
