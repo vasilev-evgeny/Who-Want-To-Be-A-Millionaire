@@ -98,7 +98,6 @@ class ResultViewController: BaseViewController {
         
         setupViews()
         setConstraints()
-        
     }
     
     func didUpdateQuestion(question: [QuestionModal]) {
@@ -120,10 +119,17 @@ class ResultViewController: BaseViewController {
         startNewGameButton.applyBackground(named: "YellowButton")
         startNewGameButton.onTap = {
             self.startNewGameButton.buttonTappedAnimate()
+            guard !GameBrain.shared.sharedGameQuestions.isEmpty else {
+                    print("вопросы не загрузились")
+                    return
+                }
             GameBrain.shared.isGameInProgress = true
+            GameBrain.shared.isMistakeAvialibale = true
             GameBrain.shared.refreshGame()
             let gameVC = GameViewController()
-            self.navigationController?.pushViewController(gameVC, animated: true)
+            SceneDelegate.resetToWNewGame()
+            self.navigationController?.navigationBar.isHidden = false
+//            self.navigationController?.pushViewController(gameVC, animated: true)
         }
         
         goToMainScreenButton.titleText = "Main screen"

@@ -7,8 +7,6 @@
 import UIKit
 
 class GameViewController: UIViewController {
-    enum Constants {
-    }
     
     let game = GameBrain.shared
     
@@ -131,6 +129,8 @@ class GameViewController: UIViewController {
         return answersStack
     }()
     
+    var answerButtonsTitles = [String]()
+    
     var answersButtonArray = [UIButton]()
     
     private func createAnswerButton(letter: Int, title: String) -> UIButton {
@@ -163,10 +163,11 @@ class GameViewController: UIViewController {
     
     var hintButtons = [UIButton]()
     
-    private func createHintButton(image: String, state: Bool) -> UIButton {
+    private func createHintButton(image: String, state: Bool, clickable: Bool) -> UIButton {
         let button = UIButton()
         button.setBackgroundImage(UIImage(named: image), for: .normal)
         button.isEnabled = state
+        button.isUserInteractionEnabled = clickable
         button.alpha = state ? 1 : 0.5
         button.titleLabel?.isHidden = true
         button.titleLabel?.text = image
@@ -282,7 +283,7 @@ class GameViewController: UIViewController {
             answersStack.trailingAnchor.constraint(equalTo: mainView.trailingAnchor, constant: -32),
             answersStack.heightAnchor.constraint(equalToConstant: 272)
         ])
-        let answerButtonsTitles = game.sharedGameQuestions[game.currentQuestion].answers.shuffled()
+        answerButtonsTitles = game.sharedGameQuestions[game.currentQuestion].answers.shuffled()
         
         for (key, value) in answerButtonsTitles.enumerated() {
             answersButtonArray.append(createAnswerButton(letter: key, title: value))
@@ -298,7 +299,7 @@ class GameViewController: UIViewController {
             hintsStack.heightAnchor.constraint(equalToConstant: 64)
         ])
         game.hintButtons.forEach {
-            hintButtons.append(createHintButton(image: $0.0, state: $0.1))
+            hintButtons.append(createHintButton(image: $0.0, state: $0.1, clickable: $0.2))
         }
         hintButtons.forEach {
             hintsStack.addArrangedSubview($0)
@@ -323,6 +324,7 @@ class GameViewController: UIViewController {
     @objc func pushBackButton(sender: UIButton) {
         sender.buttonTappedAnimate()
         SoundManager.shared.stopMusic()
+        CountdownTimer.shared.stopTimer()
         let targetVC = WelcomeViewController()
         self.navigationController?.pushViewController(targetVC, animated: true)
         targetVC.navigationItem.hidesBackButton = true
@@ -344,11 +346,13 @@ class GameViewController: UIViewController {
         sender.setBackgroundImage(UIImage(named: "YellowButton"), for: .normal)
         hintButtons.forEach { $0.isEnabled = false }
         answersStack.arrangedSubviews.forEach {$0.isUserInteractionEnabled = false}
+        backButton.isUserInteractionEnabled = false
+        self.chartButton.isUserInteractionEnabled = false
         guard let title = sender.currentAttributedTitle?.string else { return }
 
         
         let isCorrectAnswer = title.hasSuffix(game.sharedGameQuestions[game.currentQuestion].correctAnswer)
-        DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 3) { [self] in
             if isCorrectAnswer {
                 if self.game.currentPrize > UserDefaults.standard.integer(forKey: "allTimeRecord") {
                     self.game.allTimeRecord = self.game.currentPrize
@@ -369,12 +373,13 @@ class GameViewController: UIViewController {
                     if self.game.currentQuestion == (self.game.sharedGameQuestions.count - 1) {
                         ///Обновляет кол-вол верных ответов
                         self.game.allTimeRecord = self.game.answers[0].questionPrice
-                        UserDefaults.standard.set(self.game.allTimeRecord, forKey: "allTimeRecord")
                         self.game.currentQuestion += 1
                         self.gameOver()
                         SoundManager.shared.play(.million)
                     } else {
                         self.awakeAnswerModule(isShowButton: true)
+                        self.backButton.isUserInteractionEnabled = true
+                        self.chartButton.isUserInteractionEnabled = true
                         self.game.currentQuestion += 1
                         self.clearStack(for: &self.answersStack)
                         
@@ -382,15 +387,33 @@ class GameViewController: UIViewController {
                         self.answersButtonArray = []
                         self.hintButtons = []
                         self.setupUI()
-                        print(self.game.sharedGameQuestions[self.game.currentQuestion].correctAnswer)
+                        
+//                        print(self.game.sharedGameQuestions[self.game.currentQuestion].correctAnswer)
                     }
                 }
             }
             else {
-                SoundManager.shared.play(.wrong)
-                sender.setBackgroundImage(UIImage(named: "wrong_answer"), for: .normal)
-                DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
-                    self.gameOver()
+                if self.game.isMistakeAvialibale == true {
+                        sender.setBackgroundImage(UIImage(named: "wrong_answer"), for: .normal)
+                        sender.isUserInteractionEnabled = false
+                        self.game.isMistakeAvialibale = false
+                        CountdownTimer.shared.startTimer(viewController: self)
+                    self.hintButtons[2].blink(duration: 1, delay: 0.0, alpha: 0)
+                    self.game.hintButtons[2].1 = false
+                    let hideLayer = CALayer()
+                    hideLayer.backgroundColor = UIColor.black.withAlphaComponent(0.5).cgColor
+                    self.hintButtons[2].layer.addSublayer(hideLayer)
+                    self.answersStack.arrangedSubviews.forEach {
+                        if $0 != sender {
+                            $0.isUserInteractionEnabled = true
+                        }
+                    }
+                } else {
+                    SoundManager.shared.play(.wrong)
+                    sender.setBackgroundImage(UIImage(named: "wrong_answer"), for: .normal)
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+                        self.gameOver()
+                    }
                 }
             }
         }
@@ -440,6 +463,11 @@ class GameViewController: UIViewController {
         let hideLayer = CALayer()
         hideLayer.backgroundColor = UIColor.black.withAlphaComponent(0.5).cgColor
         sender.layer.addSublayer(hideLayer)
+        let barrierView = UIView()
+        barrierView.backgroundColor = .clear
+        barrierView.frame = hintsStack.frame
+//        view.addSubview(barrierView)
+        
         guard let type = sender.titleLabel?.text else { return }
         switch type {
         case game.hintButtons[0].0:
@@ -448,11 +476,14 @@ class GameViewController: UIViewController {
         case game.hintButtons[1].0:
             useAudience(sender)
             game.hintButtons[1].1 = false
-        case game.hintButtons[2].0:
-            useFriendCall(sender)
-            game.hintButtons[2].1 = false
+//        case game.hintButtons[2].0:
+//            useFriendCall(sender)
+//            game.hintButtons[2].1 = false
         default:
             break
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            barrierView.isHidden = true
         }
     }
     // Скрывает два неверных варианта
@@ -464,7 +495,11 @@ class GameViewController: UIViewController {
                 setAnswers.insert(i)
             }
         }
+        
         setAnswers.removeFirst()
+        if setAnswers.count == 3 {
+            setAnswers.removeFirst()
+        }
         for i in setAnswers {
             answersButtonArray[i].setAttributedTitle(nil, for: .normal)
             answersButtonArray[i].isEnabled = false
@@ -472,10 +507,13 @@ class GameViewController: UIViewController {
     }
     ///Выбирает выдает верный ответ с заданной вероятностью
     private func useAudience(_ sender: UIButton) {
-        let arrAnswers = getAvailableAnswerOption(winrate: 70)
+
+        let winrate = game.currentQuestion < 10 ? 70 : 50
+        let arrAnswers = getAvailableAnswerOption(with: winrate)
         guard let audienceAnswer = arrAnswers.shuffled().randomElement() else { return }
-        
-        let audienceVC = AudienceViewController(audienceAnswer: audienceAnswer)
+        let audienceElection = createDataForChart(maxAudienceOption: audienceAnswer, availableAnswer: arrAnswers)
+                             
+        let audienceVC = AudienceViewController(audienceAnswer: audienceElection)
         audienceVC.modalPresentationStyle = .popover
         audienceVC.preferredContentSize = CGSize(width: 200, height: 200)
         audienceVC.popoverPresentationController?.sourceView = sender
@@ -485,13 +523,14 @@ class GameViewController: UIViewController {
     /// Метод useAudience только с 50%
     /// Потенциально переделается для продвинутого задания
     private func useFriendCall(_ sender: UIButton) {
-        let arrAnswers = getAvailableAnswerOption(winrate: 50)
+        let arrAnswers = getAvailableAnswerOption(with: 50)
         guard let audienceAnswer = arrAnswers.shuffled().randomElement() else { return }
         
-        let audienceVC = AudienceViewController(audienceAnswer: audienceAnswer)
+        let audienceVC = CallFriendViewController(audienceAnswer: audienceAnswer)
         audienceVC.modalPresentationStyle = .popover
         audienceVC.preferredContentSize = CGSize(width: 200, height: 200)
         audienceVC.popoverPresentationController?.sourceView = sender
+        audienceVC.popoverPresentationController?.permittedArrowDirections = .down
         audienceVC.popoverPresentationController?.delegate = self
         present(audienceVC, animated: true)
     }
@@ -526,8 +565,22 @@ class GameViewController: UIViewController {
         
         return arrAnswers
     }
+    private func createDataForChart(maxAudienceOption: String, availableAnswer: [String] ) -> [CGFloat] {
+        let maxCount = Int.random(in: 40...90)
+        var dicAnswers = ["A": 0,"B": 0, "C": 0, "D": 0]
+        dicAnswers[maxAudienceOption] = maxCount
+        for key in availableAnswer {
+            dicAnswers[key] = Int.random(in: 1...maxCount-10)
+        }
+        
+        var resultArr = [CGFloat]()
+        dicAnswers.sorted(by: {$0.key < $1.key}).forEach {resultArr.append(CGFloat($0.value))}
+
+        return resultArr
+    }
+
     /// Просматривает доступные варианты ответов и формирует массив из доступных ложных
-    private func getAvailableAnswerOption (winrate: Int) -> [String] {
+    private func getAvailableAnswerOption (with winrate: Int) -> [String] {
         let correctAnswer = game.sharedGameQuestions[game.currentQuestion].correctAnswer
         var arrAnswers = [String]()
         var trueAnswerChar = ""
@@ -541,6 +594,9 @@ class GameViewController: UIViewController {
                     }
                 }
             }
+        }
+        if trueAnswerChar == "" {
+            trueAnswerChar = arrAnswers.removeFirst()
         }
         return makeRandomAnswersArray(from: arrAnswers, with: winrate, whereTrueIs: trueAnswerChar)
     }

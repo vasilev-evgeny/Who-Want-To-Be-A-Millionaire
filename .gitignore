@@ -3,4 +3,8 @@
 
 # Xcode пользовательские данные
 **/xcuserdata/*
-*.xcuserstate.DS_Store
+state.DS_Store
+*.xcuserstate
+*.xcuserstate
+.DS_Store
+.DS_Store
