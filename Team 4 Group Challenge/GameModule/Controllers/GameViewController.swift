@@ -137,8 +137,9 @@ class GameViewController: UIViewController {
         let button = UIButton()
         let letters = ["A","B", "C", "D"]
         let titleText = NSMutableAttributedString()
+        let fontSize:CGFloat = title.count > 26 ? 14 : 18
         titleText.append(attributedText(text: "\(letters[letter]):  ", fontSize: 18, color: UIColor(red: 225/255, green: 155/255, blue: 48/255, alpha: 1), firstLineIntend: 30))
-        titleText.append(attributedText(text: title, fontSize: 18, color: .white))
+        titleText.append(attributedText(text: title, fontSize: fontSize, color: .white))
         button.setBackgroundImage(UIImage(named: "BlueButton"), for: .normal)
         button.setAttributedTitle(titleText, for: .normal)
         button.contentHorizontalAlignment = .left
@@ -146,7 +147,7 @@ class GameViewController: UIViewController {
         button.translatesAutoresizingMaskIntoConstraints = false
         button.titleLabel?.lineBreakMode = .byTruncatingTail
         button.titleLabel?.numberOfLines = 1
-        button.contentEdgeInsets = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 20)
+       // button.contentEdgeInsets = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 20)
         return button
     }
     
@@ -398,6 +399,7 @@ class GameViewController: UIViewController {
                         sender.isUserInteractionEnabled = false
                         self.game.isMistakeAvialibale = false
                         CountdownTimer.shared.startTimer(viewController: self)
+                    SoundManager.shared.play(.background)
                     self.hintButtons[2].blink(duration: 1, delay: 0.0, alpha: 0)
                     self.game.hintButtons[2].1 = false
                     let hideLayer = CALayer()
@@ -511,7 +513,8 @@ class GameViewController: UIViewController {
         let winrate = game.currentQuestion < 10 ? 70 : 50
         let arrAnswers = getAvailableAnswerOption(with: winrate)
         guard let audienceAnswer = arrAnswers.shuffled().randomElement() else { return }
-        let audienceElection = createDataForChart(maxAudienceOption: audienceAnswer, availableAnswer: arrAnswers)
+        let setAnswers = Set(arrAnswers)
+        let audienceElection = createDataForChart(maxAudienceOption: audienceAnswer, availableAnswer: setAnswers)
                              
         let audienceVC = AudienceViewController(audienceAnswer: audienceElection)
         audienceVC.modalPresentationStyle = .popover
@@ -565,12 +568,16 @@ class GameViewController: UIViewController {
         
         return arrAnswers
     }
-    private func createDataForChart(maxAudienceOption: String, availableAnswer: [String] ) -> [CGFloat] {
+    private func createDataForChart(maxAudienceOption: String, availableAnswer: Set<String> ) -> [CGFloat] {
         let maxCount = Int.random(in: 40...90)
         var dicAnswers = ["A": 0,"B": 0, "C": 0, "D": 0]
-        dicAnswers[maxAudienceOption] = maxCount
+       
         for key in availableAnswer {
-            dicAnswers[key] = Int.random(in: 1...maxCount-10)
+            if maxAudienceOption == key {
+                dicAnswers[key] = maxCount
+            } else {
+                dicAnswers[key] = Int.random(in: 1...maxCount-10)
+            }
         }
         
         var resultArr = [CGFloat]()
