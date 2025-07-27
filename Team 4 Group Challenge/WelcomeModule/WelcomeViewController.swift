@@ -133,6 +133,10 @@ class WelcomeViewController: UIViewController {
     
     @objc func newGameButtonTapped(sender : UIButton) {
         sender.buttonTappedAnimate()
+        guard !GameBrain.shared.sharedGameQuestions.isEmpty else {
+                print("вопросы не загрузились")
+                return
+            }
         GameBrain.shared.isGameInProgress = true
         GameBrain.shared.isMistakeAvialibale = true
         GameBrain.shared.refreshGame()
